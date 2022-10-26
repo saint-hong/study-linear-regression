@@ -265,9 +265,9 @@ study linear regression
 - 3) `조건부 독립 가정`
     - **i번째 표본의 잡음과 j번째 표본의 잡음의 공분산 값이 x와 상관없이 항상 0이라고 가정한다.** : $\text{Cov}[\epsilon_i, \epsilon_j] = 0$
     - $\epsilon_i$와 $\epsilon_j$는 서로 독립이다.
-    - 잡음 벡터 \ep의 공분산 행렬은 대각행렬이 되어야한다. : $\text{Cov}[\epsilon] = \text{E}[\epsilon \epsilon^T] = \text{diagonal matrix}$
+    - 잡음 벡터 $\epsilon$의 공분산 행렬은 대각행렬이 되어야한다. : $\text{Cov}[\epsilon] = \text{E}[\epsilon \epsilon^T] = \text{diagonal matrix}$
 - 4) `등분산성 가정`
-    - **$\epsilon_i$와 $epsilon_j4의 분산 값이 표본과 상관없이 항상 같다고 가정한다.**
+    - **$\epsilon_i$와 $epsilon_j$의 분산 값이 표본과 상관없이 항상 같다고 가정한다.**
     - 잡음 벡터 \ep의 공분산 행렬이 항등핼렬이 되어야 한다. : $\text{Cov}[\epsilon] = \text{E}[\epsilon \epsilon^T] = \sigma^2 I$
     
 ### 6-4. 최대 가능도 방법을 사용한 선형 회귀분석
