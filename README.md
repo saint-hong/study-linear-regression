@@ -317,7 +317,7 @@ study linear regression
 - w_i의 분산은 공분산 행렬의 대각성분
     - $\text{Var}[\hat{w_i}] = \text{Cov}[\hat{w}]_{ii}$
 - w 예측치의 표준오차 : 표준편차
-    - $\sqrt{\text{Var}[\hat{w}_i]} \approx se_i = \sqrt{s^2((X^TX)^{-1})_{ii}}$
+    - $\sqrt{\text{Var}[\hat{w_i}]} \approx se_i = \sqrt{s^2(X^TX)^{-1}_{ii}}$
 - **정규화된 모수오차는 자유도가 N-K인 표준스튜던트 t분포를 따른다.** 
 
 ### 6-6. 단일 계수 t-검정
