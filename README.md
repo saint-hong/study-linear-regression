@@ -267,8 +267,8 @@ study linear regression
     - $\epsilon_i$와 $\epsilon_j$는 서로 독립이다.
     - 잡음 벡터 $\epsilon$의 공분산 행렬은 대각행렬이 되어야한다. : $\text{Cov}[\epsilon] = \text{E}[\epsilon \epsilon^T] = \text{diagonal matrix}$
 - 4) `등분산성 가정`
-    - **$\epsilon_i$와 $epsilon_j$의 분산 값이 표본과 상관없이 항상 같다고 가정한다.**
-    - 잡음 벡터 \ep의 공분산 행렬이 항등핼렬이 되어야 한다. : $\text{Cov}[\epsilon] = \text{E}[\epsilon \epsilon^T] = \sigma^2 I$
+    - **$\epsilon_i$와 $\epsilon_j$의 분산 값이 표본과 상관없이 항상 같다고 가정한다.**
+    - 잡음 벡터 $\epsilon$의 공분산 행렬이 항등핼렬이 되어야 한다. : $\text{Cov}[\epsilon] = \text{E}[\epsilon \epsilon^T] = \sigma^2 I$
     
 ### 6-4. 최대 가능도 방법을 사용한 선형 회귀분석
 - 확률론적 선형 회귀모형의 가정과 최대 가능도 방법(MLE : Maximum Likelihood Estimation)을 사용하여 가중치 벡터 w의 값을 구한다.
@@ -284,7 +284,7 @@ study linear regression
     - $e = y - \hat{y} = y - Hy = (I-H)y = My = M(Xw + \epsilon)$
     - $e = M\epsilon$
 - 잔차는 잡음의 선형변환(linear transform)이다. 정규분포의 선형변환은 정규분포이므로 잔차 e도 정규분포를 따른다.
-    - 잡음 \epsilon은 정규분포를 따른다.
+    - 잡음 $\epsilon$은 정규분포를 따른다.
     
 #### 잔차의 정규성 검정
 - `정규성 검정 normality test` : 확률분포가 가우시안 정규분포를 따르는지 확인
@@ -303,10 +303,10 @@ study linear regression
 - `가중치 벡터 w의 예측치의 공분산 행렬을 구하고, 공분산 행렬의 대각성분이 분산이므로, 이 분산으로부터 표준편차를 구한다.`
 - 가중치의 예측치 $\hat{w}$도 정규분포확률변수인 \epsilon의 선형변환이므로 정규분포를 따른다. 
     - $\hat{w} = w + (X^TX)^{-1}X^T\epsilon$
-- \hat{w}의 기댓값은 w와 같다.
+- $\hat{w}$의 기댓값은 w와 같다.
     - $\text{E}[\hat{w}] = w$
-    - \hat{w}는 w의 비편향 추정값이다.      
-- \hat{w}의 공분산
+    - $\hat{w}$는 w의 비편향 추정값이다.      
+- $\hat{w}$의 공분산
     - $\text{Cov}[\hat{w}] = \sigma^2(X^TX)^{-1}$
 - 잔차의 분산으로부터 잡음의 분산을 추정
     - $\text{E}[e^2] = \sigma^2(N-K)$
@@ -314,7 +314,7 @@ study linear regression
     - $s^2 = \dfrac{e^Te}{N-k} = \dfrac{RSS}{N-K}$
 - \hat{w}(가중치의 예측치)의 공분산 추정값
     - $\text{Cov}[\hat{w}] \approx s^2(X^TX)^{-1}$
-- w_i의 분산은 공분산 행렬의 대각성분
+- $w_i$의 분산은 공분산 행렬의 대각성분
     - $\text{Var}[\hat{w_i}] = \text{Cov}[\hat{w}]_{ii}$
 - w 예측치의 표준오차 : 표준편차
     - $\sqrt{\text{Var}[\hat{w_i}]} \approx se_i = \sqrt{s^2(X^TX)^{-1}_{ii}}$
