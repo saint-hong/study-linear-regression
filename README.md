@@ -363,7 +363,7 @@ study linear regression
 - 예측값 $\hat{y}$를 X의 각 열 c1,...,cM의 선형조합으로 표현 할 수 있다.
     - $\hat{y} = Xw = w_1c_1 + w_2c_2 + \cdots + w_Mc_M$
     - ci는 X의 열벡터
-- 모든 열 ci가 선형독립(풀랭크)이면 예측값 \hat{y}는 X의 각 열을 **기저벡터(basis vector) 로 하는 벡터공간 위에 존재한다.**
+- 모든 열 ci가 선형독립(풀랭크)이면 예측값 $\hat{y}$는 X의 각 열을 **기저벡터(basis vector) 로 하는 벡터공간 위에 존재한다.**
 
 #### 회귀모형의 각 상수항을 벡터공간에 나타내면
 - 예측값 $\hat{y}$
@@ -382,16 +382,16 @@ study linear regression
 - `잔차행렬 residual matrix` : 종속값 벡터 y를 잔차 벡터 e로 변환하는 행렬 M
     - $e = My$
     - $M = I-H = I - X(X^TX)^{-1}X^T$
-- `투영행렬 projection matrix` : 종속값 벡터 y를 예측값 벡터 \hat{y}로 변환하는 행렬 H
+- `투영행렬 projection matrix` : 종속값 벡터 y를 예측값 벡터 $\hat{y}$로 변환하는 행렬 H
     - $\hat{y} = Hy$
     - $H = X(X^TX)^{-1}X^T$
     - 햇(hat)행렬, **영향도 행렬(influence matrix)**
 
 #### 잔차행렬 M과 투영행렬 H의 성질
 - 1) 대칭행렬이다.
-    - $M^T=M,\;\; H^T=H$
+    - $M^T=M, H^T=H$
 - 2) 멱등행렬(idempotent)이다. : 자기자신을 몇번을 곱하든 자기자신이 되는 행렬
-    - $M^2=M^5=M,\;\; H^2=H^7=H$
+    - $M^2=M^5=M, H^2=H^7=H$
 - 3) M과 H는 서로 직교한다.
     - $MH = HM = 0$
 - 4) M은 X와 직교한다.
