@@ -831,6 +831,97 @@ study linear regression
     - **cross-validation 오차 발생** : 트레이닝(학습, 훈련데이터)에 사용되지 않은 새로운 독립변수(검증 데이터) 값을 입력하면 오차가 커진다.
     - **추정의 부정확함 발생** : 샘플이 조금만 변화해도 가중치 계수(w_i)의 값이 크게 달라진다.
 
+## 12. 교차검증
+
+### 12-1. 표본내 성능과 표본외 성능
+- **학습 training = 모수 추정 과정**
+- `학습용 데이터 집합 training data set` : 모형의 학습을 위한 데이터 집합
+- `표본내 성능 검증 in-sample testing` : 학습 데이터 집합의 종속값에 대한 예측 성능
+- `예측 prediction` : 종속 변수 값을 알지 못하는 학습에 사용하지 않은 표본에 대해 종속 변수의 값을 알아내는 것
+- `표본외 성능 검증 out-of-sample testing` : 학습에 쓰이지 않은 표본 데이터 집합의 종속 변수값을 얼마나 잘 예측했는지 검사하는 것
+    - **교차검증 cross validation** 
+    
+### 12-2. 과최적화
+- `과최적화 overfitting` : 표본내 성능은 매우 좋으나 표본외 성능은 상대적으로 떨어지는 현상
+    - 즉 모형이 특정 샘플에 과도하게 최적화 되어 있는 상태
+    - 일반적으로 표본내 성능과 표본외 성능은 비슷한 수준이다.
+- 모형이 과최적화 되면 학습 데이터에 대해서는 종속 변수값을 잘 예측하지만, 새로운 데이터(검증 데이터)가 주어지면 전혀 예측을 못하게 된다.
+    - 쓸모없는 모형이 된다.
+- `정규화 regularization` : 모형의 과최적화를 방지하기 위한 방법
+- `교차검증 cross-validation` : 모형의 과최적화 발생을 탐지하는 방법
+
+### 12-3. 검증용 데이터 집합
+- 교차검증에 필요한 데이터 집합
+    - 학습 데이터 집합 training data set : 모형의 모수추정을 위한 데이터
+    - 검증 데이터 집합 test data set : 모형의 성능을 측정하기 위한 데이터
+- `학습/검증 데이터 분리 train-test split` : 교차검증을 위한 데이터 분리
+    - 두 데이터 모두 종속변수가 있어야 한다.
+    - 따라서 기존의 데이터를 학습용과 검증용 데이터로 나누어서 사용한다.
+
+### 12-4. statsmodels 패키지에서의 교차검증
+- statsmodels 패키지를 사용한 회귀분석에서는 학습/검증 데이터를 직접 분리해야 한다.
+    - 소규모 데이터를 분석하는 경우에는 다항회귀 방법으로 모형의 차수가 증가하지 않는이상 과최적화가 발생하지 않기때문
+    - 학습 데이터의 비율값을 정하여 학습 데이터 분리
+        - train = np.random.choice(np.arange(len(df)), np.int(ratio*len(df)) 
+    - 검증 데이터는 학습데이터를 제외한 것으로 선택하는 방식
+        - test = list(set(np.arange(len(df))).difference(train)
+- 검증 데이터로 모형 성능 측정
+    - rss = ((검증데이터의 종속변수 - 예측값) ** 2).sum()
+    - tss = ((검증데이터의 종속변수 - 검증데이터의 종속변수의 평균) ** 2).sum()
+    - rsquared = 1 - rss/tss
+    
+### 12-5. scikit-learn의 교차검증
+- 독립변수의 갯수가 많은 빅데이터에서는 과최적화가 쉽게 발생함
+    - scikit-learn의 model_selection 서브 패키지 : 교차검증용 패키지
+
+#### 데이터 분리
+- **train_test_split(data, data2, test_size, train_size, random_state)**
+    - data : 독립변수 데이터 배열 또는 dataframe
+    - data2 : 종속변수 데이터 베열 또는 dataframe, 독립변수에 종속변수 포함이면 생략
+    - test_size : 검증용 데이터 갯수, 1보다 작은 실수면 비율을 의미
+    - train_size : 학습용 데이터 갯수, 1보다 작은 실수면 비율을 의미
+    - test_size 또는 train_size 하나만 입력 해도 됨
+    - random_state : 난수 시드
+- 반환되는 값 : X_train, X_test, y_train, y_test    
+
+### 12-6. K-폴드 교차검증
+- `K-폴드 교차검증 방법` : 기존의 데이터에서 학습/검증 데이터를 분리할 때 어느 한쪽에 치우쳐서 안되는 문제를 해결하기 위한 방법
+    - 학습 데이터와 검증 데이터 분리를 모든 데이터에 대해서 돌아가면서 실시한다. 
+    - D1~Dk-1 / Dk
+    - D1~Dk-2, Dk / Dk-1
+    - D1~Dk-3, Dk-1~Dk / Dk-2
+- K개의 모형과 K개의 교차검증 성능이 반환되고, K개의 교차검증 성능의 평균을 최종 교차검증 성능을 계산한다.
+    - 보통 5차 검증을 실시한다. (K=5)
+- 서브패키지 임포트
+    - from sklearn.model_selection import KFold
+    - cv = KFold(5, shuffle=True, random_state=0)
+- 반복문을 사용하여 K-폴드 교차검증을 진행할 수 있다.
+    - 각 차수마다 학습데이터와 검증데이터로 분리된다.
+    - 각 차수마다 학습, 검증을 진행한 후 성능 지표를 계산하여 반환한다.
+
+### 12-7. 평가점수
+- 예측성능 평가 함수
+    - scikit-learn의 metrics 서브패키지
+    - **r2_score** : 결정계수
+    - **mean_square_error** : 평균 제곱 오차 (mean square error) : **mse** 값
+    - **median_absolute_error** : 절대 오차 중앙값 (median absolute error) : **mae** 값
+    
+### 12-8. 교차검증 반복
+- 교차검증 반복을 간단하게 실행 해주는 함수
+- **cross_val_score(model, X, y, scoring=Nont, cv=None)**
+    - model : 회귀분석 모형
+    - X : 독립변수 데이터
+    - y : 종속변수 데이터
+    - scoring : 성능 검증 함수 이름
+    - cv : 교차검증 생성기 객체 또는 숫자
+        - None : KFold(3)
+        - k : KFold(k)
+- cross_val_score()는 scikit-learn에서 제공하는 모형에만 적용 가능
+    - statsmodels 모형 객체에 사용하려면 래퍼 클래스를 만들어 인수들을 정해주어야 한다.
+    
+### 12-9. 벤치마크 검증 데이터
+- 검증 데이터가 완전히 새로운 데이터로 주어진다고 하더라도, 학습용 데이터를 K-폴드 방법으로 나누어 교차검증을 하여 과최적화를 방지한다.    
+
 
 
 
