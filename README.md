@@ -2,7 +2,6 @@
 study linear regression
 
 # 요약
-# 회귀분석
 
 ## 1. 회귀분석 예제
 - `예측문제 prediction` : 특정한 입력변수값을 사용하여 출력변수의 값을 계산하는 것
