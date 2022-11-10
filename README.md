@@ -975,77 +975,123 @@ study linear regression
 - `VIF 값과 변수간 상관계수 값을 사용하여 덜 의존적인 변수를 선택할 수 있다.`
     - VIF 값이 작고 상관계수 값이 작은 것
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+## 14. 정규화 선형회귀
+- 과최적화를 막는 방법
+    - Ridge : RSS + (alpha * 가중치의 제곱합)
+    - Lasso : RSS + (alpha * 가중치의 절대값의 합)
+    - Elastic Net : RSS + (alpha * 가중치의 제곱합) + (alpha * 가중치의 절대값의 합)
+- 하이퍼 모수(alpha, lambda 등)와 가중치 w의 관계
+    - alpha 증가 -> 정규화 제약조건 강화(정규화 정도 커짐) -> 가중치 w_i값 감소
+    - alpha 감소 -> 정규화 제약조건 감소(정규화 정도 작아짐) -> 가중치 w_i값 증가
+    - alpha=0 -> 일반 선형회귀모형
+- 최적정규화
+    - 최적의 성능을 만드는 정규화 하이퍼 모수 선택
+    - 다항회귀 차수 선택
+- 다항회귀의 차수와 정규화 가중치(하이퍼 모수)의 관계
+    - 차수 증가 -> 정규화 제약조건 강화 -> alpha 증가
+    - 차수 감소 -> 정규화 제약조건 감소 -> alpha 감소
+- 검증 성능과 정규화 선형회귀의 관계
+    - 하이퍼 모수, 모형의 차수, 가중치 w_i의 값이 균형을 이뤄야 한다.
+    - 어떤 요인이 증가하거나 높아진다고 반드시 검증 성능이 높아지는 것은 아니다.
+    - 그러나 과최적화를 막는 방향으로의 최적 정규화가 이루어지는 것이 좋다.
+
+### 14-1. 정규화 선형회귀
+- `정규화 regularized 선형회귀 방법` : 선형회귀의 계수(weight, 모수, 가중치벡터)에 대한 제약조건을 추가함으로써 모형이 과도하게 과최적화되는 것을 막는 방법
+    - Regularized Method, Penalized Method, Contrained Least Squares
+- 과최적화로 나타나는 현상
+    - 모형 계수의 크기가 과도하게 증가하는 경향이 나타난다.
+    - **cross-validation 오차 발생** : 트레이닝(학습, 훈련데이터)에 사용되지 않은 새로운 독립변수(검증 데이터) 값을 입력하면 오차가 커진다.
+    - **추정의 부정확함 발생** : 샘플이 조금만 변화해도 가중치 계수(w_i)의 값이 크게 달라진다.
+- `정규화 방법의 기능` : 제약조건을 적용하여 계수의 크기가 과도하게 커지는 것을 제한한다.
+- `정규화 방법`
+    - Ridge 회귀모형
+    - Lasso 회귀모형
+    - Elastic Net 회귀모형
+
+### 14-2. Ridge 회귀모형
+- `Ridge 회귀모형` : 가중치들(계수, 모수)의 제곱합(squared sum of weights)을 최소화하는 것을 제약조건으로 갖는다.
+    - $w = \arg \underset{w}{min} \left(\sum_{i=1}^{N} e_i^2 + \lambda \sum_{j=1}^{M} w_j^2 \right)$
+- $\lambda$ : 잔차제곱합과 추가 제약 조건인 가중치의 제곱합의 비중을 조절하기 위한 **하이퍼 모수(hyper parameter)**
+    - $\lambda$ 가 커지면 -> 정규화 정도가 커진다 + 가중치의 값들이 작아진다.
+    - $\lambda$ 가 작아지면 -> 정규화 정도가 작아진다 + 가중치의 값들이 커진다.
+    - $\lambda$ 가 0이면 -> 일반적인 선형회귀모형 (추가 제약조건이 없어지므로)
+- $\lambda$ 와 가중치 값은 반비례
+
+### 14-3. Lasso 회귀모형
+- `Lasso 회귀모형 Least Absolute Shrinkage and Selection Operator` : 가중치의 절대값의 합을 최소화 하는 제약조건을 갖는다.
+    - $w = \arg \underset{w}{min} \left(\sum_{i=1}^{N} e_i^2 + \lambda \sum_{j=1}^{M} |w_j| \right)$
+
+### 14-4. Elastic Net 회귀모형
+- `Elastic Net 회귀모형` : 가중치의 제곱합과 절대값의 합을 동시에 제약조건으로 갖는다.
+    - Ridge와 Lasso 모형을 합쳐 놓은 것
+    - $w = \arg \underset{w}{min} \left(\sum_{i=1}^{N} e_i^2 + \lambda_1 \sum_{j=1}^{M} |w_j| + \lambda_2 \sum_{j=1}^{M} w_j^2 \right)$
+- 하이퍼 모수가 2개 이다.
+
+### 14-5. statsmodels의 정규화 회귀모형
+- OLS 클래스의 fit_regularized() 메서드 사용
+    - Elastic Net의 모형 계수를 계산할 수 있다.
+- statsmodels 의 모형식은 약간 다름
+    - $0.5 \times \text{RSS} / N + \text{alpha} \times \left( 0.5 \times (1-\text{L1_wt}) \sum w_i^2 + \text{L1_wt} \sum |w_i|) \right)$
+    - 하이퍼 모수 : alpha, L1_wt
+- `result = model.fit_regularized(alpha=0.01, L1_wt=0)`
+    - L1_wt = 0 : Ridge 회귀모형
+    - L1_wt = 1 : Lasso 회귀모형
+    - 0 < L1_wt < 1 : Elastic Net 회귀모형
+
+### 14-6. scikit-learn의 정규화 회귀모형
+- Ridge, Lasso, Elastic Net 각각의 클래스 있음
+    - 각 클래스별 인수로 alpha 값 설정
+    - Elastic Net 만 l1_ratio 값을 실수로 설정
+- `model = make_pipeline(poly, Ridge(alpha=0.01)).fit(X, y)`
+    - make_pipeline()을 사용해서 다항함수와 회귀모형을 합할 수 있다.
+- Ridge(alpha=0.01)
+    - $\text{RSS} + \text{alpha} \sum w_i^2$
+- Lasso(alpha=0.01)
+    - $0.5 \times \text{RSS}/N + \text{alpha} \sum |w_i|$
+- ElasticNet(alpha=0.01, l1_ratio=0.5) : l1_ratio는 실수값
+    - $0.5 \times \text{RSS} / N + 0.5 \times \text{alpha} \times \left( 0.5 \times (1-\text{l1_ratio}) \sum w_i^2 + \text{l1_ratio} \sum |w_i|) \right)$
+
+### 14-6. 정규화 모형의 장점
+- 정규화 모형은 회귀 분석에 사용된 데이터가 달라져도 계수값이 크게 달라지지 않도록 한다.
+    - 모형이 과최적화가 되면 데이터가 달라질 경우 계수값이 크게 증가하는 경향이 있다.
+    - 정규화 모형은 계수값에 제한조건을 추가하여 커지는 것을 막아준다.
+
+### 14-7. 정규화의 의미
+- 정규화 제한조건은 정규화가 없는 최적화 문제에 부등식 제한조건을 추가한 것과 같다.
+    - 라그랑지 방법을 사용하여 부등식 제한조건이 없는 최적화 문제로 만들어 준것.
+
+### 14-8. Ridge 모형과 Lasso 모형의 차이
+- alpha 인수의 값을 변화시키면 가중치 계수마다 값이 축소되어간다.
+    - Ridge 모형 : 가중치 계수를 한 꺼번에 축소시킨다.
+    - Lasso 모형 : 일부 가중치 계수가 먼저 0으로 수렴한다.
+
+### 14-9. 최적 정규화
+- 정규화에 사용되는 하이퍼모수(alpha 값)를 바꾸면 모형의 검증 성능도 바뀐다.
+    - 가중치 계수의 값이 바뀌기 때문이다.
+- `최적 정규화 optimal regularization` : 최적의 성능을 만드는 정규화 하이퍼 모수를 선택하는 과정
+- 정규화로 인한 학습/검증 성능의 변화
+    - 정규화 가중치 alpha 값이 작을수록 학습 성능은 좋아진다.(과최적화 되므로)
+    - 정규화 가중치 alpha 값이 특정 범위에 있을 때 검증 성능이 가장 좋아진다.
+
+### 14-10. 검증성능 곡선
+- `검증성능 곡선 validation curve` : 특정한 하이퍼모수를 변화시킬 때 학습성능과 검증성능의 변화를 나타낸 곡선
+- scikit-learn 패키지의 model_selection 서브패키지의 validation_curve() 함수
+    - **from sklearn.model_selection import validation_curve**
+    - estimator : fit, predict 메서드를 구현하는 객체
+    - X : 독립변수
+    - y : 종속변수
+    - param_name : str : 하이퍼모수의 이름
+    - param_range : 평가되는 매개변수 값
+    - groups : 샘플의 그룹 레이블
+    - cv : int : 교차검증 회수
+    - scoring : 성능 평가 지표
+    - train_score와 test_score 를 반환한다.
+
+### 14-11. 다항회귀의 차수 결정
+- 다항회귀의 차수와 정규화 가중치의 관계
+- 정규화 가중치 : 하이퍼 모수인 alpha, lambda 값 : 모형의 가중치벡터 w를 말하는 것이 아님
+    - 다항회귀 차수 증가 -> 모형 제약조건 감소 -> 정규화 가중치 alpha 작아진다.
+        - 과최적화이므로 학습성능 증가, 검증성능 감소
+    - 다항회귀 차수 감소 -> 모형 제약조건 증가 -> 정규화 가중치 alpha 커진다.
+- 다항회귀의 최적의 차수를 결정하는 문제는 최적 정규화에 해당한다.
 
