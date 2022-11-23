@@ -79,10 +79,10 @@ Description and Summary of the Machine Learning
 - 확률적 모형(probabillistic model)
     - 생성 모형(generative model)
         - LDA/QDA
-	- 나이브베이즈(naivebayes)
+        - 나이브베이즈(naivebayes)
     - 판별 모형(discriminant model)
         - 로지스틱 회귀(logistic regression)
-	- 의사결정 나무(decision tree)
+        - 의사결정 나무(decision tree)
 - 판별함수 모형(discriminant function model)
     - 퍼셉트론(perceptron)
     - 서포트벡터머신(SVM)
@@ -93,9 +93,9 @@ Description and Summary of the Machine Learning
     - 랜덤 포레스트(random forest)
     - 부스팅(boosting)
         - adaboost
-	- gradient boost
-	- XGboost
-	- LightGBM
+        - gradient boost
+        - XGboost
+        - LightGBM
 - 모형최적화
     - hyperparameter tunning
     - grid search
@@ -114,10 +114,10 @@ Description and Summary of the Machine Learning
     - collaborative filtering
     - neighborhood models
         - user based CF
-	- item based CF
+        - item based CF
     - latent factor models
         - matrix factorization
-	- SVD
+        - SVD
 - 추천성능 평가기준
 - 유사도(simirarity)
 
