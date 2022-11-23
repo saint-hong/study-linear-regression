@@ -76,6 +76,11 @@ Description and Summary of the Machine Learning
     - 다항회귀의 차수 결정
 
 ## 2. Classification
+- 분류 기초
+    - 분류용 예제 데이터
+    - 분류용 가상 데이터 생성
+    - 분류모형들
+    - 분류성능평가
 - 확률적 모형(probabillistic model)
     - 생성 모형(generative model)
         - LDA/QDA
