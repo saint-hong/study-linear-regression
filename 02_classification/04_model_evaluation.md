@@ -408,6 +408,9 @@ fallout =  0.125
 - y축 : 재현율 : TPR
 
 #### roc curve 반환값
+- thresholds 값은 판별함수값 중에서 선택된 값이다.
+    - model.decision_function(X) 의 결과는 각 샘플별 판별함수값이다.
+    - thresholds 값은 이 값들 중에서 선택된다.
 
 ```python
 from sklearn.metrics import roc_curve
