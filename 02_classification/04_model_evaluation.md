@@ -444,6 +444,9 @@ fpr, tpr, thresholds
 ```
 
 #### roc curve
+- 직접구한 recall과 fallout은 roc_curve의 반환 된 tpr, fpr의 값에 해당한다.
+    - 재현율(tpr)이 가장 크고, 위양성률(fpr)이 가장 작은 지점의 값과 같다.
+    - roc_curve는 thresholds를 여러가지로 바꿔가면서 fpr과 tpr을 계산한 것.
 
 ```python
 %matplotlib inline
