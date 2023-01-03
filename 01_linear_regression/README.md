@@ -257,14 +257,19 @@ study linear regression
     - 기댓값 : x의 선형조합 $w^Tx$ 
     - 분산 : $\sigma^2$
     - 잡음 $\epsilon$ 으로 선형회귀모형을 나타낼 수 있다. : $\epsilon = y-w^Tx$
+    - 잡음(disturbance) : 선형회귀모형에서 영향력이 작거나 일일이 측정하기 힘들어서 무시하는 수 많은 입력변수들의 영향을 하나로 합친 것과 같다.
+        - 잔차(residual)와 다르다. 
+        - 잡음은 기댓값이 0이고 분산이 $\sigma^2$인 정규분포라고 가정할 수 있다.
 - 2) `외생성 가정 Exogeneity`
     - **잡음 $\epsilon$의 조건부 기대값은 독립변수 x에 상관없이 항상 0이라고 가정한다.** : $\text{E}[\epsilon | x] = 0$
     - 무조건부 기댓값 = 0
     - 잡음 $\epsilon$과 독립변수 x가 상관관계가 없다.
 - 3) `조건부 독립 가정`
     - **i번째 표본의 잡음과 j번째 표본의 잡음의 공분산 값이 x와 상관없이 항상 0이라고 가정한다.** : $\text{Cov}[\epsilon_i, \epsilon_j] = 0$
+        - 확률변수의 공분산행렬 $Cov[X, Y]$는 X와 Y의 상관관계를 의미한다.
     - $\epsilon_i$와 $\epsilon_j$는 서로 독립이다.
     - 잡음 벡터 $\epsilon$의 공분산 행렬은 대각행렬이 되어야한다. : $\text{Cov}[\epsilon] = \text{E}[\epsilon \epsilon^T] = \text{diagonal matrix}$
+        - $Cov[X] = E[(X-E[X])(X-E[X])^T]$
 - 4) `등분산성 가정`
     - **$\epsilon_i$와 $\epsilon_j$의 분산 값이 표본과 상관없이 항상 같다고 가정한다.**
     - 잡음 벡터 $\epsilon$의 공분산 행렬이 항등핼렬이 되어야 한다. : $\text{Cov}[\epsilon] = \text{E}[\epsilon \epsilon^T] = \sigma^2 I$

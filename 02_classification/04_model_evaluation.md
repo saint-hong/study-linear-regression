@@ -408,6 +408,9 @@ fallout =  0.125
 - y축 : 재현율 : TPR
 
 #### roc curve 반환값
+- thresholds 값은 판별함수값 중에서 선택된 값이다.
+    - model.decision_function(X) 의 결과는 각 샘플별 판별함수값이다.
+    - thresholds 값은 이 값들 중에서 선택된다.
 
 ```python
 from sklearn.metrics import roc_curve
@@ -441,6 +444,9 @@ fpr, tpr, thresholds
 ```
 
 #### roc curve
+- 직접구한 recall과 fallout은 roc_curve의 반환 된 tpr, fpr의 값에 해당한다.
+    - 재현율(tpr)이 가장 크고, 위양성률(fpr)이 가장 작은 지점의 값과 같다.
+    - roc_curve는 thresholds를 여러가지로 바꿔가면서 fpr과 tpr을 계산한 것.
 
 ```python
 %matplotlib inline
@@ -864,6 +870,10 @@ array([[0.40526708, 0.59473292],
 - y_pred_test는 1차원 배열, 이것을 reshape(-1, 1)로 모양을 변환한다.
     - 2차원 배열의 모양으로 바뀐다.
     - 각 데이터가 하나의 행의 데이터가 된다.
+- np.vstack([pred_proba[:, 0], pred_proba[:, 1], y_pred_test]).T
+    - vstack을 사용해서 합칠 수 있다.
+    - y_pred_test가 1열이므로 다른 데이터도 1열로 만들어 줘야한다.
+    - concatenate는 열의 갯수 상관없이 합칠 수 있다.
 
 ```python
 np.concatenate([pred_proba, y_pred_test.reshape(-1, 1)], axis=1)
