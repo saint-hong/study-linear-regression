@@ -7,10 +7,10 @@ Description and Summary of the classification
 - 확률적 모형(probabillistic model)
     - 생성 모형(generative model)
         - LDA/QDA
-	- 나이브베이즈(naivebayes)
+        - 나이브베이즈(naivebayes)
     - 판별 모형(discriminant model)
         - 로지스틱 회귀(logistic regression)
-	- 의사결정 나무(decision tree)
+        - 의사결정 나무(decision tree)
 - 판별함수 모형(discriminant function model)
     - 퍼셉트론(perceptron)
     - 서포트벡터머신(SVM)
