@@ -55,7 +55,7 @@
     - 자세한 계산방법은 알아 볼 것
 
 - `조건부 확률` : 가능도를 베이즈 정리에 대입하여 식을 정리
-    - <img src="https://latex.codecogs.com/gif.latex?%5Cbegin%7Baligned%7D%20P%28y%3Dk%7Cx%29%20%26%3D%20%5Cdfrac%7Bp%28x%7Cy%3Dk%29%20P%28y%3Dk%29%7D%7B%5Csum_%7Bl%7D%20p%28x%7Cy%3Dl%29%20P%28y%3Dl%29%7D%20%5C%5C%20%26%3D%20%5Cdfrac%7BC%27%28x%29%20%5Cexp%28w_k%5E%7BT%7Dx%20&plus;%20w_%7Bk0%7D%29%20P%28y%3Dk%29%7D%7B%5Csum_%7Bl%7D%20C%27%28x%29%20%5Cexp%28w_l%5E%7BT%7Dx%20&plus;%20w_%7Bl0%7D%29P%28y%3Dl%29%7D%20%5C%3B%5C%3B%20%28%5Ctext%7BC%27%28x%29%20delete%7D%29%5C%5C%20%26%3D%20%5Cdfrac%7BP%28y%3Dk%29%20%5Cexp%28w_k%5E%7BT%7Dx%20&plus;%20w_%7Bk0%7D%29%7D%7B%5Csum_%7Bl%7D%20P%28y%3Dl%29%20%5Cexp%28w_l%5E%7BT%7Dx%20&plus;%20w_%7Bl0%7D%29%7D%20%5C%5C%20%26%3D%20%5Cdfrac%7BP%28y%3Dk%29%20%5Cexp%28w_k%5E%7BT%7Dx%20&plus;%20w_%7Bk0%7D%29%7D%7BP%28x%29%7D%20%5C%5C%20%5Cend%7Baligned%7D" />
+    - <img src="https://latex.codecogs.com/gif.latex?%5Cbegin%7Baligned%7D%20P%28y%3Dk%7Cx%29%20%26%3D%20%5Cdfrac%7Bp%28x%7Cy%3Dk%29%20P%28y%3Dk%29%7D%7B%5Csum_%7Bl%7D%20p%28x%7Cy%3Dl%29%20P%28y%3Dl%29%7D%20%5C%5C%20%26%3D%20%5Cdfrac%7BC%27%28x%29%20%5Cexp%28w_k%5E%7BT%7Dx%20&plus;%20w_%7Bk0%7D%29%20P%28y%3Dk%29%7D%7B%5Csum_%7Bl%7D%20C%27%28x%29%20%5Cexp%28w_l%5E%7BT%7Dx%20&plus;%20w_%7Bl0%7D%29P%28y%3Dl%29%7D%20%5C%3B%5C%3B%20%28%5Ctext%7BC%27%28x%29%20delete%7D%29%5C%5C%20%26%3D%20%5Cdfrac%7BP%28y%3Dk%29%20%5Cexp%28w_k%5E%7BT%7Dx%20&plus;%20w_%7Bk0%7D%29%7D%7B%5Csum_%7Bl%7D%20P%28y%3Dl%29%20%5Cexp%28w_l%5E%7BT%7Dx%20&plus;%20w_%7Bl0%7D%29%7D%20%5C%5C%20%26%3D%20%5Cdfrac%7BP%28y%3Dk%29%20%5Cexp%28w_k%5E%7BT%7Dx%20&plus;%20w_%7Bk0%7D%29%7D%7BP%28x%29%7D%20%5C%5C%20%5Cend%7Baligned%7D"/>
 
 - 이 조건부 확률식을 로그변환
     - $\log P(y=k|x) = \log P(y=k) + w_{k}^T x + w_{k0} - \log P(x) = w_{k}^T x + C_k^{''}$
