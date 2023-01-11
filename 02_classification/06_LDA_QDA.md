@@ -807,4 +807,7 @@ sns.set(rc={"figure.figsize" : (8, 6)})
 sns.set_style("whitegrid")
 sns.scatterplot(X2[:, 2], X2[:, 3], hue=y2, palette="Set2", style=y2, s=100, edgecolor="k", lw=3)
 ```
+![lq_9.png](./images/lq/lq_9.png)
+
+
 
