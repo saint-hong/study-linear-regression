@@ -2112,48 +2112,1164 @@ bern : 0.6316960751240939
 gau : 0.45922975773305885
 ```
 
+## 7. 나이브베이즈 실습 1 : 이미지 마스킹
+
+### 7-1. wordcloud 이미지 마스킹
+- 텍스트 데이터 임포트
+- 이미지 임포트
+- stopwords 객체 생성 : STOPWORDS 를 임포트한다.
+- WordCloud() 객체 생성
+    - background_color
+    - max_words
+    - mask : 마스크할 이미지 객체
+    - stopwords : 텍스트 분석에서 제거할 단어들
+- WordCloud().generate(text) : 이미지에 단어들을 마스킹 한다.
+- plt.imshow() 클래스로 마스킹 이미지를 그린다.
+
+### 패키지 임포트
+
+```python
+from wordcloud import WordCloud, STOPWORDS
+from PIL import Image
+```
+
+### Alice 데이터 임포트
+
+```python
+text = open("../../04_machine_learning/ml_0410/alice.txt").read()
+print(text)
+
+>>> print
+
+This eBook is for the use of anyone anywhere at no cost and with
+almost no restrictions whatsoever.  You may copy it, give it away or
+re-use it under the terms of the Project Gutenberg License included
+with this eBook or online at www.gutenberg.org
 
 
+Title: Alice's Adventures in Wonderland
+
+Author: Lewis Carroll
+
+Posting Date: June 25, 2008 [EBook #11]
+Release Date: March, 1994
+[Last updated: December 20, 2011]
+...
+```
+### 관사, 대명사 등 제거할 단어들
+- STOPWORDS 클래스에 저장되어 있다.
+
+```python
+stopwords = set(STOPWORDS)
+stopwords
+
+>>> print
+
+{'a',
+ 'about',
+ 'above',
+ 'after',
+ 'again',
+ 'against',
+ 'all',
+ 'also',
+ 'am',
+ 'an',
+ ...
+```
+
+### 제거할 단어 추가
+- 텍스트에 따라서 반복적으로 등장하는 불필요한 단어를 stopwords 리스트에 없는 단어를 추가 해주어도 된다.
+    - 딕셔너리 데이터 타입에 추가하는 경우
+    - stopwords.add("word1") : add() 함수를 사용하여 추가해 준다.
 
 
+```python
+stopwords.add("said")
+stopwords.add("sadness")
+
+if ("said") and ("sadness") in stopwords :
+    print("ok")
+
+>>> print
+
+ok
+```
+
+### 앨리스 마스킹 이미지 임포트
+- 배경에 아이보리색이 있다.
+- plt.imshow()의 cmap 인수에서 plt.cm.gray로 하면 하면 색으로 바뀐다.
+
+```python
+alice_mask = np.array(Image.open("../../04_machine_learning/ml_0410/alice_mask.png"))
+alice_mask
+
+>>> print
+
+array([[255, 255, 255, ..., 255, 255, 255],
+       [255, 255, 255, ..., 255, 255, 255],
+       [255, 255, 255, ..., 255, 255, 255],
+       ...,
+```
+
+- 이미지 임포트
+
+```python
+plt.figure(figsize=(10, 10))
+plt.imshow(alice_mask, cmap=plt.cm.gray, interpolation="bilinear")
+plt.axis("off")
+plt.show() ;
+```
+![nb_22.png](./images/nb/nb_22.png)
 
 
+### 앨리스 이미지에 텍스트 단어 마스킹
+- WordCloud 객체 생성하면 앨리스 이미지의 형태에 맞게 분석한 단어의 빈도수에 따라서 마스킹 한다.
+
+```python
+wc = WordCloud(background_color="white", max_words=2000, mask=alice_mask,
+              stopwords=stopwords)
+wc
+
+>>> print
+
+<wordcloud.wordcloud.WordCloud at 0x181987df608>
+```
+
+#### WordCloud 객체의 generate 클래스에 앨리스 텍스트를 인수로 넣는다.
+- 빈도수 계산 : wc.generate(text)
+- 단어 반환 속성값 : `wc.word_`
+    - stopwords를 빼고 단어의 빈도수를 계산하여 반환한다.
+
+```python
+wc = wc.generate(text)
+wc.words_
+
+>>> print
+
+{'Alice': 1.0,
+ 'little': 0.29508196721311475,
+ 'one': 0.27595628415300544,
+ 'know': 0.2459016393442623,
+ 'went': 0.226775956284153,
+ 'thing': 0.2185792349726776,
+ 'time': 0.2103825136612022,
+ 'Queen': 0.20765027322404372,
+ 'see': 0.1830601092896175,
+ 'King': 0.17486338797814208,
+ 'well': 0.1721311475409836,
+ 'now': 0.16393442622950818,
+ ...}
+```
+
+### 앨리스 이미지에 단어의 빈도수에 맞게 마스킹
+- generate() 하면 이미지의 형태에 맞게 단어의 빈도율에 따라 크기를 달리하여 채워 넣어 준다.
+
+```python
+plt.figure(figsize=(10, 10))
+plt.imshow(wc, interpolation="bilinear")
+plt.axis("off")
+plt.show() ;
+```
+![nb_23.png](./images/nb/nb_23.png)
+
+## 8. 나이브베이즈 실습 2 : 자연어 분석
+
+### 8-1. NLTK
+- `import nltk`
+- 파이썬의 자연어 분석 라이브러리
+    - Natural Language Toolkit
+    - NLTK
+- `from nltk.tokenize import word_tokenize` 
+    - 텍스트의 말뭉치를 만들어주는 클래스
+
+### 8-2. nltk.NaiveBayesClassifier
+- `nltk 라이브러리의 나이브베이즈분류 클래스 사용`
+    - import nltk
+    - nltk.NaiveBayesClassifier()
+- 나이브베이즈 모형
+    - 기계학습분야에서 베이즈 정리를 적용한 확률(조건부 확률) 분류기의 일종 
+    - 베이즈 정리 : 데이터의 특성들 사이의 독립을 가정하는 이론
+    - 조건부 독립 : 무조건부 독립과 다르다.
+- nltk의 나이브베이즈분류기는 텍스트 분류에 주로 사용된다.
+    - 텍스트의 단어의 빈도수(혹은 다른값)에 대한 조건부 확률을 구하고 가장 큰 값을 반환한다.
+- `sklearn의 나이브베이즈 모형`    
+    - 가우시안, 이항, 다항 분포에 따라서 텍스트 데이터가 아니어도 분류 가능
+    - GaussianNB(), BernoulliNB(), MultinomialNB() 
+
+### 8-3. 학습 데이터 생성
+- 독립변수와 종속변수를 각각 튜플 타입으로 구분하여 만들어 준다.
+- 리스트에 저장한다.
+
+```python
+train = [
+    ("i like you", "pos"),
+    ("i hate you", "neg"),
+    ("you like me", "neg"),
+    ("i like her", "pos")
+]
+train
+
+>>> print
+
+[('i like you', 'pos'),
+ ('i hate you', 'neg'),
+ ('you like me', 'neg'),
+ ('i like her', 'pos')]
+```
+
+### 8-4. tokenize : 말뭉치 만들기
+
+#### 문장에서 단어를 찾고 구분하여 반환한다.
+- 한 문장이 하나의 str로 되어 있어야 한다.
+- 단어의 형태가 아닌 것은 제거한다.
+
+```python
+import nltk
+from nltk.tokenize import word_tokenize
+```
+
+- 한 문장만 테스트하면 문장을 구성하는 단어들이 각각 리스트안에 저장된다.
+
+```python
+word_tokenize(train[0][0])
+
+>>> print
+
+['i', 'like', 'you']
+```
+
+#### 리스트컴프리헨션의 이중 for문을 사용하여 trian 데이터를 말뭉치화 한다.
+- `trian -> sentence -> word_tokenize(sentence[0]) -> word -> word.lower()`
+- set()에 넣어 저장한다.
+    - **데이터가 중복이면 하나의 값만 반환한다.**
+- `c for a in data for b in object(a)`
+    - c 가 반환된다.
+    - c 는 b의 결과이다.
+    - b 는 object(a)에서 나온다.
+    - a 는 data에서 나온 값이다.
+    - 즉 첫번째 for문의 값을 두번째 for문의 순회객체에 사용할 수 있다.    
+
+```python
+all_words = set(word.lower() for sentence in train
+                for word in word_tokenize(sentence[0]))
+all_words
+
+>>> print
+
+{'hate', 'her', 'i', 'like', 'me', 'you'}
+```
+
+- 다른 문장으로 테스트
+
+```python
+test = text[:172]
+test
+
+>>> print
+
+"癤풮roject Gutenberg's Alice's Adventures in Wonderland, by Lewis Carroll\n\nThis eBook is for the use of anyone anywhere at no cost and with\nalmost no restrictions whatsoever."
+```
+
+```python
+set(word.lower() for sentence in test.split(" ") for word in word_tokenize(sentence))
+
+>>> print
+
+{"'s",
+ ',',
+ '.',
+ 'adventures',
+ 'alice',
+ 'almost',
+ 'and',
+ 'anyone',
+ 'anywhere',
+ 'at',
+ 'by',
+ 'carroll',
+ 'cost',
+ 'ebook',
+ 'for',
+ 'gutenberg',
+ 'in',
+ 'is',
+ 'lewis',
+ 'no',
+ 'of',
+ 'restrictions',
+ 'the',
+ 'this',
+ 'use',
+ 'whatsoever',
+ 'with',
+ 'wonderland',
+ '癤풮roject'}
+```
+
+#### 일반적인 이중 반복문의 다른 형태
+
+```python
+all_words = []
+
+for sentence in train :
+    for word in word_tokenize(sentence[0]) :
+        all_words.append(word.lower())
+
+set(all_words)
+
+>>> print
+
+{'hate', 'her', 'i', 'like', 'me', 'you'}
+```
+
+### 8-5. 훈련용 데이터 마킹
+- 전체 말뭉치를 train 데이터의 각 문장과 비교하여 들어있는지 확인한다. 
+    - True, False 출력
+    - 데이터에 라벨링을 하는 것과 같은 의미이다.
+- trian 데이터의 한 세트를 비교한 후, pos와 neg 라벨을 붙여준다.
+- for문 2개를 조합하여 사용
+
+#### 리스트컴프리헨션에 이중for문을 사용
+- 두번째 for문으로부터 독립변수 값과 종속변수 값이 들어있는 튜플을 받는다.
+- 이 튜플에서 첫번째인 문장을 말뭉치화하여 첫번째 for문에서 받은 말뭉치와 비교하고 True, False 를 반환한다.
+    - **즉 스펨메일에서 키워드가 들어있는지 없는지를 파악하는 것과 같은 의미이다.**
+    - 다항분포의 의미
+
+```python
+t = [({word : (word in word_tokenize(x[0])) for word in all_words}, x[1])
+    for x in train]
+t
+
+>>> print
+
+[({'i': True,
+   'like': True,
+   'you': True,
+   'hate': False,
+   'me': False,
+   'her': False},
+  'pos'),
+ ({'i': True,
+   'like': False,
+   'you': True,
+   'hate': True,
+   'me': False,
+   'her': False},
+  'neg'),
+ ({'i': False,
+   'like': True,
+   'you': True,
+   'hate': False,
+   'me': True,
+   'her': False},
+  'neg'),
+ ({'i': True,
+   'like': True,
+   'you': False,
+   'hate': False,
+   'me': False,
+   'her': True},
+  'pos')]
+```
+
+### 8-6. nltk.NaivebayesClassifier 분류 적용
+- i=True 일 때 y=pos 인 조건부 확률
+    - i 가 있다는 것은 (i = True) pos : neg = 1.7 : 1.0 의 확률로 pos라는 의미
+- 여기서 pos는 말뭉치에 마킹한 것(종속변수의 값)을 토대로 분석한 것
+    - trian 데이터의 마킹
+
+```python
+nltk_nb = nltk.NaiveBayesClassifier.train(t)
+nltk_nb.show_most_informative_features()
+
+>>> print
+
+Most Informative Features
+                    hate = False             pos : neg    =      1.7 : 1.0
+                     her = False             neg : pos    =      1.7 : 1.0
+                       i = True              pos : neg    =      1.7 : 1.0
+                    like = True              pos : neg    =      1.7 : 1.0
+                      me = False             pos : neg    =      1.7 : 1.0
+                     you = True              neg : pos    =      1.7 : 1.0
+```
+
+### 8-7. test 문장
+- 검증할 test 문장 생성
+- 말뭉치가 test 문장에 있는지 확인 후 T, F로 마킹
+    - {말뭉치 : (말뭉치 in [test의 말뭉치]) for 말뭉치 in 전체말뭉치}
+
+```python
+test_sentence = "I like Kim"
+test_sentence_features = {
+    word.lower() : (word in word_tokenize(test_sentence.lower()))
+    for word in all_words}
+
+test_sentence_features
+
+>>> print
+
+{'i': True,
+ 'like': True,
+ 'you': False,
+ 'hate': False,
+ 'me': False,
+ 'her': False}
+```
+
+### 8-8. 분류결과
+- 학습용 문장과 정답데이터로부터 학습을 한 나이브베이즈 모형으로부터 예측 조건부확률을 구했고
+- 새로운 테스트 문장을 말뭉치화하여 다항분포 처럼 만들어 줬다.
+- 이것을 나이브베이즈 모형에 넣고 분류예측을 하면, 어떤 클래스에 속하는지 출력해준다.
+
+```python
+nltk_nb.classify(test_sentence_features)
+
+>>> print
+
+'pos'
+```
+
+## 9. 나이브베이즈 실습 3 : 유사 문서 검색
+- sklearn의 fetch_20newsgroups 데이터를 나이브베이즈 모형으로 분류 예측
+
+### 9-1. 데이터 임포트
+
+```python
+from sklearn.datasets import fetch_20newsgroups
+
+news = fetch_20newsgroups()
+news.target_names
+
+>>> print
+
+['alt.atheism',
+ 'comp.graphics',
+ 'comp.os.ms-windows.misc',
+ 'comp.sys.ibm.pc.hardware',
+ 'comp.sys.mac.hardware',
+ 'comp.windows.x',
+ 'misc.forsale',
+ 'rec.autos',
+ 'rec.motorcycles',
+ 'rec.sport.baseball',
+ 'rec.sport.hockey',
+ 'sci.crypt',
+ 'sci.electronics',
+ 'sci.med',
+ 'sci.space',
+ 'soc.religion.christian',
+ 'talk.politics.guns',
+ 'talk.politics.mideast',
+ 'talk.politics.misc',
+ 'talk.religion.misc']
+```
+
+### 9-2. 학습할 클래스 선택
+- 일부 클래스에 대해서만 학습데이터를 받는다.
+
+```python
+categories = ["alt.atheism", "soc.religion.christian", "comp.graphics", "sci.med"]
+news_train = fetch_20newsgroups(subset="train", categories=categories,
+                               shuffle=True, random_state=13)
+```
+
+### 9-3. 클래스와 데이터의 갯수
+
+```python
+news_train.target_names
+
+>>> print
+
+['alt.atheism', 'comp.graphics', 'sci.med', 'soc.religion.christian']
+
+len(news_train.data)
+
+>>> print
+
+2257
+```
+
+### 9-4. 첫번째 데이터 내용
+- 문서 형태로 된 데이터가 각 인덱스마다 저장되어 있다.
+
+```python
+print(news_train.data[0])
+
+>>> print
+
+From: geb@cs.pitt.edu (Gordon Banks)
+Subject: Re: Update (Help!) [was "What is This [Is it Lyme's?]"]
+Article-I.D.: pitt.19436
+Reply-To: geb@cs.pitt.edu (Gordon Banks)
+Organization: Univ. of Pittsburgh Computer Science
+Lines: 42
+
+In article <1993Mar29.181958.3224@equator.com> jod@equator.com (John Setel O'Donnell) writes:
+...
+```
+
+### 9-5. 첫번째 데이터의 타겟(종속값) 확인
+- 종속값 = 클래스
+    - 타겟 이름의 인덱스로 사용할 수 있다. 
+
+```python
+news_train.target[0]
+
+>>> print
+
+2
+
+news_train.target_names[news_train.target[0]]
+
+>>> print
+
+'sci.med'
+```
+
+### 9-6. CountVectorizer()
+- 데이터의 크기가 크기 때문에 말뭉치가 매우 많다.
+- 말뭉치가 어떤 문서에 포함되는지 확인해보면 배열의 길이가 매우 크다는 것을 알 수 있다.
+- 희소행렬을 반환해 준다.
+    - 희소행렬을 이용하면 몇개 안되는 특정값들을 확인 할 수 있다.
+    - 문서를 벡터화 한 것과 같다.
+
+```
+0010000000 ---> 021 : 0행 2열에 1 
+0000002000 ---> 162 : 1행 6열에 2
+0000300000 ---> 243 : 2행 4열에 3
+```
+
+#### CountVectorizer() 모형 생성
+
+```python
+from sklearn.feature_extraction.text import CountVectorizer
+
+cv = CountVectorizer()
+cv
+
+>>> print
+
+CountVectorizer()
+```
+
+#### 학습 데이터 훈련
+
+```python
+X_train_counts = cv.fit_transform(news_train.data)
+X_train_counts.shape
+
+>>> print
+
+(2257, 35788)
+```
+
+- 변환된 데이터의 형태
+    - 전체 문서에 사용된 단어별로 몇개가 있는지 반환된다.
+    - 즉 d면체 주사위를 N번씩 x번 던져서 얻은 데이터와 같은 의미이다.
+
+```python
+X_train_counts.toarray()
+
+>>> print
+
+array([[0, 0, 0, ..., 0, 0, 0],
+       [0, 0, 0, ..., 0, 0, 0],
+       [0, 0, 0, ..., 0, 0, 0],
+       ...,
+       [0, 0, 0, ..., 0, 0, 0],
+       [0, 0, 0, ..., 0, 0, 0],
+       [0, 0, 0, ..., 0, 0, 0]], dtype=int64)
+```
+
+#### 말뭉치의 갯수
+- 독립변수의 갯수와 같다.
+
+```python
+len(X_train_counts.toarray()[0])
+
+>>> print
+
+35788
+```
+
+#### 희소행렬은 말뭉치별 BOW 벡터와 같다.
+- 한 행(하나의 문서)에 어떤 단어가 몇개 들어있는지
+- 0번째 문서는 320개의 말뭉치가 있다.
+
+```python
+np.sum(X_train_counts.toarray()[0])
+
+>>> print
+
+320
+```
+
+- 0번째 데이터의 희소행렬의 데이터의 종류 
+
+```python
+np.unique(X_train_counts.toarray()[0])
+
+>>> print
+
+array([ 0,  1,  2,  3,  4,  5,  8,  9, 10, 13], dtype=int64)
+```
+
+### 9-7. Tfidf 모형 생성 및 학습, 데이터 변환
+- 문서데이터를 countvectorizer() 희소행렬 형태로 만들고 tfidf로 변환한다.
+- tfidf는 희소행렬에 빈도수 가중치값을 반환해 준다.
+
+```python
+from sklearn.feature_extraction.text import TfidfTransformer
+
+tf_transformer = TfidfTransformer(use_idf=False).fit(X_train_counts)
+X_train_tf = tf_transformer.transform(X_train_counts)
+X_train_tf
+
+>>> print
+
+<2257x35788 sparse matrix of type '<class 'numpy.float64'>'
+	with 365886 stored elements in Compressed Sparse Row format>
+```
+
+#### tfidf로 변환된 데이터의 갯수, 특징벡터의 갯수
+- 데이터의 갯수 : 문서의 갯수
+- 특징벡터의 갯수 : 말뭉치의 갯수
+
+```python
+num_samples, num_features = X_train_tf.shape
+num_samples, num_features
+
+>>> print
+
+(2257, 35788)
+```
+
+- 변환된 데이터의 형태
+
+```python
+X_train_tf.toarray()
+
+>>> print
+
+array([[0., 0., 0., ..., 0., 0., 0.],
+       [0., 0., 0., ..., 0., 0., 0.],
+       [0., 0., 0., ..., 0., 0., 0.],
+       ...,
+       [0., 0., 0., ..., 0., 0., 0.],
+       [0., 0., 0., ..., 0., 0., 0.],
+       [0., 0., 0., ..., 0., 0., 0.]])
+```
+
+- 변환된 데이터의 0번째 값
+    - countvect 에서 변환 된 데이터는 0부터 N까지의 정수 데이터
+    - countvect 값을 tfidf 로 변환한 데이터는 실수 데이터
+    - tfidf 변환을 통해 빈도수에 대한 가중치가 곱해졌기 때문
+
+```python
+np.unique(X_train_tf.toarray()[0])
+
+>>> print
+
+array([0.        , 0.02985407, 0.05970814, 0.08956222, 0.11941629,
+       0.14927036, 0.23883257, 0.26868665, 0.29854072, 0.38810293])
+```
+
+### 9-8. MultinomialNB 모형 생성
+- 독립변수가 실수형 데이터로 이루어진 경우 다항 나이브베이즈 분류를 사용할 수 있다.
+- 훈련 데이터로 tfidf로 변환한 배열을 종속변수 target을 사용한다.
+    - X -> countvectorizer() 희소행렬 벡터화 -> tfidftransformer() 빈도수 가중치값 벡터화
+    - countvect : 주사위의 한면이 몇 번 나왔는지에 대한 데이터 : 정수
+    - tfidf : 주사위의 한면이 몇번씩 나왔는지에 대한 빈도수에 따른 가중치를 곱한 값 : 실수
+
+```python
+from sklearn.naive_bayes import MultinomialNB
+
+clf_mnb = MultinomialNB().fit(X_train_tf, news_train.target)
+clf_mnb
+
+>>> print
+
+MultinomialNB()
+```
+
+### 9-9. 새로운 문장으로 나이브베이즈 모형 테스트
+
+```python
+docs_new = ["God is love", "OpenGL on the GPU is fast"]
+
+X_new_counts = cv.transform(docs_new)
+X_new_tfidf = tf_transformer.transform(X_new_counts)
+
+y_pred = clf_mnb.predict(X_new_tfidf)
+
+for doc, category in zip(docs_new, y_pred) :
+    print(category)
+    print("%s => %s" % (doc, news_train.target_names[category]))
+
+>>> print
+
+3
+God is love => soc.religion.christian
+1
+OpenGL on the GPU is fast => comp.graphics
+```
+
+#### 테스트 문장에 대한 모형의 예측 클래스
+
+```python
+y_pred
+
+>>> print
+
+array([3, 1], dtype=int64)
+```
+
+### 9-10. 현재까지 진행 과정
+- 1. train 데이터 생성
+    - twenty_train
+    - categories = ['alt.atheism', 'soc.religion.christian', 'comp.graphics', 'sci.med']
+- 2. countvectorizer 객체생성 후 표본 데이터 변환
+    - **말뭉치가 한 문서(데이터 하나)에서 몇번 나왔는지 계산 : 정수형 데이터**
+    - count_vect = CountVectorizer()
+    - X_train_counts = count_vect.fit_transform(twenty_train.data)
+- 3. tfidftransformer 객체생성 후 데이터 변환
+    - **countvec 에서 희소행렬 처럼 변환된 데이터에 빈도수에 따른 가중치의 곱을 계산 : 실수형 데이터**
+    - countvec 으로 벡터화 한것을 tfidftransformer 에 학습
+        - tf_transformer = TfidfTransformer(ues_idf=False).fit(X_train_counts)
+    - tf_transformer 모델에 다시넣고 변환 (빈도수에 따라 가중치 부여)
+        - X_train_tf = tf_transformer.transformer(X_train_counts)
+4. Naive Bayes 모형으로 예측 분류
+    - **tfidf 변환으로 실수형 독립변수이지만, 0부터 N까지의 데이터에 기반한 것이므로 다항 나이브베이즈 사용**
+    - 분류기 객체생성 : tf 적용한 X_train 벡터 데이터와 원래 y_train 데이터로 학습
+        - clf = MultinomialNB().fit(X_train_tf, twenty_train.target)
+5. 새로운 문장으로 테스트
+    - twenty_train 데이터로 학습시킨 count_vect 모델로 벡터화
+        - X_new_counts = count_vect.transform(docs_new)
+    - tf_transformer 에 넣고 tf 벡터화
+        - X_new_tfidf = tf_transformer.transform(X_new_counts)
+    - 분류 모델로 예측
+        - predicted = clf.predict(X_new_tfidf)
+        - 새로운 문장이 어떤 카테고리와 유사한지 예측결과 반환
+
+### 9-11. 파이프라인 적용
+- 여러 객체들을 하나로 연결해 준다.
+
+```python
+from sklearn.pipeline import Pipeline
+
+text_clf = Pipeline([
+    ('vect', CountVectorizer()),
+    ('tfidf', TfidfTransformer()),
+    ('clf', MultinomialNB())
+])
+
+text_clf
+
+>>> print
+
+Pipeline(steps=[('vect', CountVectorizer()), ('tfidf', TfidfTransformer()),
+                ('clf', MultinomialNB())])
+```
+
+### 9-12. 학습
+
+```python
+text_clf.fit(news_train.data, news_train.target)
+
+>>> print
+
+Pipeline(steps=[('vect', CountVectorizer()), ('tfidf', TfidfTransformer()),
+                ('clf', MultinomialNB())])
+```
+
+### 9-13. 검증 데이터 생성
+- fetch_20newsgroups 데이터셋에서 test 데이터 임포트
+
+```python
+news_test = fetch_20newsgroups(subset='test', categories=categories, shuffle=True,
+                              random_state=13)
+len(news_test.data)
+
+>>> print
+
+1502
+```
+- 테스트 데이터 샘플 확인
+
+```python
+test_docs = news_test.data
+print(test_docs[0][:200])
+
+>>> print
+
+From: mayne@pipe.cs.fsu.edu (Bill Mayne)
+Subject: Re: Why do people become atheists?
+Reply-To: mayne@nu.cs.fsu.edu
+Organization: Florida State University Computer Science Department
+Lines: 68
+
+In arti
+```
+
+### 9-14. 텍스트 분류기(파이프라인)로 분류 예측
+- 예측 클래스와 실제 클래스값을 비교한 후 T, F 배열로 만든다.
+- 이것의 평균을 구하면 T의 비율, 즉 실제값과 예측값이 맞은 비율을 계산할 수 있다.
+
+```python
+y_pred = text_clf.predict(test_docs)
+y_pred
+
+>>> print
+
+array([3, 1, 3, ..., 3, 2, 1], dtype=int64)
+```
+
+- 예측값의 길이
+    - 학습데이터의 길이와 같다.
+
+```python
+len(y_pred)
+
+>>> print
+
+1502
+```
+
+#### 실제값과 예측값의 차이에 따른 평균값 계산
+- True=1, False=0 이라는 점을 사용하여 평균값 계산
+    - 전체 길이중에서 True의 비율
+
+```python
+np.mean(y_pred == news_test.target)
+
+>>> print
+
+0.8348868175765646
+```
+
+- 간단한 예로 테스트
+    - 전체 길이 : 4, True의 합 : 3
+    - True의 비율 : 3/4 = 0.75
+
+```python
+np.mean(np.array([True, True, False, True]))
+
+>>> print
+
+0.75
+```
+
+### 9-15. 분류결과보고서
+- target names 인수에서 클래스 이름을 지정해 줄 수 있다.
+
+```python
+print(classification_report(news_test.target, y_pred,
+                           target_names=news_test.target_names))
+
+```
+![nb_24.png](./images/nb/nb_24.png)
 
 
+### 9-16. 분류결과표
+- 실제클래스(행)와 예측클래스의 갯수를 나타낸 표
+    - y=0을 0으로 예측한 것 : 192개
+    - y=0을 1로 예측한 것 : 2개 
+
+```python
+print(confusion_matrix(news_test.target, y_pred))
+
+>>> print
+
+[[192   2   6 119]
+ [  2 347   4  36]
+ [  2  11 322  61]
+ [  2   2   1 393]]
+```
+
+## 10. 나이브베이즈 실습 3 : 스팸 메일 데이터 분류
+- SMS Spam Collection Datasets
+
+### 10-1. 데이터 임포트
+
+```python
+mail_data = pd.read_csv("../../04_machine_learning/sms-spam-collection-dataset/spam.csv", encoding="latin-1")
+```
+
+### 10-2. 필요없는 컬럼 제거
+
+```python
+mail_data.drop([str(col) for col in mail_data.columns[2:]], axis=1, inplace=True)
+```
+
+### 10-3. 컬럼명 변경
+
+```python
+mail_data = mail_data.rename(columns={"v1":"class", "v2":"text"})
+mail_data.head(3)
+```
+![nb_25.png](./images/nb/nb_25.png)
 
 
+### 10-4. 데이터 통계
+
+```python
+mail_data.groupby("class").describe()
+```
+![nb_26.png](./images/nb_26.png)
 
 
+### 10-5. 메일 데이터의 길이 정보
+- df["length"] = df["text"].apply(len)
+    - apply 함수를 실행하여 text 컬럼의 각 데이터들의 길이를 구하고 저장한다.
+- 정상메일과 스팸메일의 일반적인 특징으로 메일의 길이를 파악해 보기 위함.    
+
+```python
+mail_data["length"] = mail_data["text"].apply(len)
+mail_data.head(3)
+```
+![nb_27.png](./images/nb/nb_27.png)
+
+### 10-6. 정상메일과 스팸메일의 길이 분석
+- 정상메일과 스펨메일의 특징을 대략 알 수 있다.
+    - 정상메일의 길이는 100 주변이 많다.
+    - 스펨메일의 길이는 150 주변이 많다.
+    - 즉 스펨메일의 길이가 대체로 더 길다는 것을 의미한다.
+
+```python
+mail_data.hist(column="length", by="class", bins=100, figsize=(15, 6))
+plt.show() ;
+```
+![nb_28.png](./images/nb/nb_28.png)
+
+#### 정상메일과 스펨메일의 평균길이 비교
+- 스펨메일이 정상메일보다 더 길다.
+
+```python
+mail_data[mail_data["class"]=="ham"]["length"].agg("mean")
+
+>>> print
+
+71.02362694300518
+
+mail_data[mail_data["class"]=="spam"]["length"].agg("mean")
+
+>>> print
+
+138.8661311914324
+```
+
+### 10-7. 텍스트에서 불필요한 단어 정리
+- 단어정리기 함수 만들기
+- **데이터의 적용은 파이프라인의 카운트벡터 모형에서 사용**
+    - Pipeline의 CountVectorizer(analyizer=단어정리기)
+- `stopword.words("english")` : 영어 대명사
+- `string`
+    - whitespace : 공백 문자열
+    - ascii_lowercase : 알파벳 소문자
+    - ascii_uppercase : 알파벳 대문자
+    - ascii_letters : 알파벳 소문자 대문자
+    - digits : 십진수 숫자
+    - hexdigits : 16진수 숫자, 문자
+    - octdigits : 8진수 숫자
+    - punctuation : 특수기호
+    - printable : 모든 문자기호    
+
+#### 단어 정리기 생성
+- 특수기호, 영어 대명사 제거
+- 특수기호를 제거한 데이터를 join을 통해 문장으로 합쳐준다.
+- split() 함수를 사용하여 공백단위로 쪼갠 후 대명사를 제거한다.
+- join으로 합치지 않으면 문자별로 떨어져 있기때문에 대명사인 문자가 다 삭제가 된다.
+
+```python
+def text_cleaner2(text) :
+    nonpunc = [char for char in text if char not in string.punctuation]
+    nonpunc = "".join(nonpunc)
+
+    clean_words = [word for word in nonpunc.split()
+                   if word.lower() not in stopwords.words("english")]
+
+    return clean_words
+```
+
+### 10-8. train, test 데이터 분리
+
+```python
+from sklearn.model_selection import train_test_split
+
+X_train, X_test, y_train, y_test = \
+train_test_split(mail_data["text"], mail_data["class"], test_size=0.2)
+
+X_train.shape, X_test.shape, y_train.shape, y_test.shape
+
+>>> print
+
+((4457,), (1115,), (4457,), (1115,))
+```
+
+### 10-9. pipeline 생성
+- pipeline에 여러가지 객체를 함께 저장하고 연결시킨다.
+    - CountVectorizer() : 문서데이터를 단어별 희소행렬로 변환
+    - TfidfTransformer() : 희소행렬에 빈도수에 따른 가중치값을 곱하여 변환
+    - MultinomialNB() : 다항 나이브베이즈 모형, 독립변수가 0부터 N인 정수형 데이터일때 사용
+        - 여기서는 tfidf 변환 데이터가 실수값이지만 원래 구조자체는 countvec의 희소행렬이므로 사용한다.
+	- 어떤 단어가 몇번 나왔는지를 나타낸 것이므로
+
+```python
+from sklearn.feature_extraction.text import CountVectorizer, TfidfTransformer
+from sklearn.naive_bayes import MultinomialNB
+from sklearn.pipeline import Pipeline
+
+pipeline = Pipeline([
+    ("vect", CountVectorizer(analyzer=text_cleaner2)),
+    ("tfidf", TfidfTransformer()),
+    ("clf", MultinomialNB())
+])
+
+pipeline
+
+>>> print
+
+Pipeline(steps=[('vect',
+                 CountVectorizer(analyzer=<function text_cleaner2 at 0x000002296B629948>)),
+                ('tfidf', TfidfTransformer()), ('clf', MultinomialNB())])
+```
+
+### 10-10. 학습
+
+```python
+pipeline.fit(X_train, y_train)
+
+>>> print
+
+Pipeline(steps=[('vect',
+                 CountVectorizer(analyzer=<function text_cleaner2 at 0x000002296B629948>)),
+                ('tfidf', TfidfTransformer()), ('clf', MultinomialNB())])
+```
+
+### 10-11. 테스트 데이터로 예측
+
+```python
+predictions = pipeline.predict(X_test)
+predictions
+
+>>> print
+
+array(['ham', 'ham', 'ham', ..., 'ham', 'ham', 'ham'], dtype='<U4')
+```
+
+### 10-12. 분류결과보고서
+
+```python
+print(classification_report(y_test, predictions))
+```
+![nb_29.png](./images/nb/nb_29.png)
 
 
+#### 실제값과 예측값의 일치 비율
+- accuracy 값과 같다.
+
+```python
+np.mean(predictions==y_test)
+
+>>> print
+
+0.9650224215246637
+```
+
+### 10-13. 시각화
+- 분류결과표를 히트맵으로 시각화
+
+```python
+from sklearn.metrics import confusion_matrix
+
+print(confusion_matrix(y_test, predictions))
+
+>>> print
+
+[[962   0]
+ [ 39 114]]
+```
+
+- 히트맵
+
+```python
+sns.set({"figure.figsize" : (8, 6)})
+sns.heatmap(confusion_matrix(y_test, predictions), annot=True, fmt=".0f")
+plt.show() ;
+```
+![nb_30.png](./images/nb/nb_30.png)
 
 
+### 10-14. 새로운 표본 데이터로 모형 성능테스트
+- 원본 데이터 프레임에서 df.sample(k) 함수를 사용하여 k개의 샘플을 선택한다.
 
+```python
+random_mail = mail_data.loc[mail_data.sample(5).index]
+random_mail
+```
+![nb_31.png](./images/nb/nb_31.png)
 
+#### 랜덤 메일 하나로 합치기
+- 각 메일마다 라벨링이 되어 있었던 것을 하나로 합쳤을 때 모형은 클래스를 어떻게 예측할지 알아보기 위함.
+    - 즉 문장의 단어 빈도수에 따라서 어떻게 분류할 것인가.
 
+```python
+new_text = [random_mail_text.values.sum()]
+new_text
 
+>>> print
 
+['Someone U know has asked our dating service 2 contact you! Cant Guess who? CALL 09058091854 NOW all will be revealed. PO BOX385 M6 6WUThis message is free. Welcome to the new & improved Sex & Dogging club! To unsubscribe from this service reply STOP. msgs@150p 18+onlyLooks like u wil b getting a headstart im leaving here bout 2.30ish but if u r desperate for my company I could head in earlier-we were goin to meet in rummer.G.W.RI am taking you for italian food. How about a pretty dress with no panties? :)']
+```
 
+### 10-15. 파이프라인으로 예측
+- 랜덤 메일의 클래스는 spam 2개, ham 3개
+- 예측 클래스 조건부 확률 
+    - ham : 0.83006742
+    - spam : 0.16993258
 
+#### 예측 클래스값
 
+```python
+new_pred = pipeline.predict(new_text)
+new_pred
 
+>>> print
 
+array(['ham'], dtype='<U4')
+```
 
+- 새로운 표본과 예측 클래스값을 출력
 
+```python
+for doc, result in zip(new_text, new_pred) :
+    print("test_mail : <%r...> =====> %s mail" % (doc[:20], result))
 
+>>> print
 
+test_mail : <'Someone U know has a'...> =====> ham mail
+```
 
+#### 새로운 표본 데이터에 대한 예측 조건부 확률값
 
+```python
+pipeline.predict_proba(new_text)
 
+>>> print
 
+array([[0.83006742, 0.16993258]])
+```
 
+#### 새로운 표본 데이터가 원래 가지고 있던 클래스값
+- 여러 샘플 데이터를 합친 것이므로 각각의 샘플의 실제값을 확인
+    - 모형으로 예측한 값이 ham 이 나온 것이 신뢰도가 높다고 할 수 있다.
 
+```python
+random_mail["class"].values
 
+>>> print
 
-
-
-
-
-
-
+array(['spam', 'spam', 'ham', 'ham', 'ham'], dtype=object)
+```
 
