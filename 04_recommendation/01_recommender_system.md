@@ -149,10 +149,10 @@
 - `평균제곱차이 유사도 Mean Squared Difference, MSD` : 유클리드 공간에서 거리 제곱에 비례하는 값과 같다.
     - msd 값을 구한 후 역수를 적용한다. msd 값이 0이 될 수 있으므로 1을 더해준다.
 - 사용자에 대한 msd 유사도
-    - $\text{msd_sim}(u, v) = \dfrac{1}{msd(u,v) + 1}$
+    - $\text{msd sim}(u, v) = \dfrac{1}{msd(u,v) + 1}$
     - $msd(u, v) = \dfrac{1}{\vert I_{uv} \vert} \cdot \sum_{i \in I_{uv}} (r(u,i) - r(v, i))^2$
 - 상품에 대한 msd 유사도
-    - $\text{msd_sim}(i, j) = \dfrac{1}{msd(i,j) + 1}$
+    - $\text{msd sim}(i, j) = \dfrac{1}{msd(i,j) + 1}$
     - $msd(i, j) = \dfrac{1}{\vert U_{ij} \vert} \cdot \sum_{u \in U_{ij}} (r(u,i) - r(u, j))^2$
 - $U_{ij}$ : 상품 i와 상품 j를 모두 평가한 **사용자의 집합**
 - $\vert U_{ij} \vert$ : 상품 i와 상품 j를 모두 평가한 **사용자의 수**
