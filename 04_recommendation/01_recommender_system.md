@@ -160,8 +160,7 @@
 
 
 
-
-
+/usr/bin/bash: +: command not found
 
 
 
