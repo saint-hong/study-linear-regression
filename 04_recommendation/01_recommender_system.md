@@ -234,12 +234,12 @@
 - `평균제곱차이 유사도 Mean Squared Difference, MSD` : 유클리드 공간에서 거리 제곱에 비례하는 값과 같다.
     - msd 값을 구한 후 역수를 적용한다. msd 값이 0이 될 수 있으므로 1을 더해준다.
 - `사용자에 대한 msd 유사도` : 상품 i에 대한 사용자 u와 v의 평점의 차이를 제곱한 후, 사용자 u와 v가 공통으로 평가한 상품의 수로 나누어 준 값. 
-    - $\text{msd_sim}(u, v) = \dfrac{1}{msd(u,v) + 1}$
+    - $\text{msd sim}(u, v) = \dfrac{1}{msd(u,v) + 1}$
     - $msd(u, v) = \dfrac{1}{\vert I_{uv} \vert} \cdot \sum_{i \in I_{uv}} (r(u,i) - r(v, i))^2$
     - $I_{uv}$ : 사용자 u와 사용자 v에 의해 평가된 **상품의 집합**
     - $\vert I_{uv} \vert$ : 사용자 u와 사용자 v에 의해 평가된 **상품의 수**
 - `상품에 대한 msd 유사도` : 사용자 u가 매긴 상품 i와 상품 j의 평점의 차이를 제곱한 후, 상품 i와 j를 공통으로 평가한 사용자의 수로 나누어 준 값.
-    - $\text{msd_sim}(i, j) = \dfrac{1}{msd(i,j) + 1}$
+    - $\text{msd sim}(i, j) = \dfrac{1}{msd(i,j) + 1}$
     - $msd(i, j) = \dfrac{1}{\vert U_{ij} \vert} \cdot \sum_{u \in U_{ij}} (r(u,i) - r(u, j))^2$
     - $U_{ij}$ : 상품 i와 상품 j를 모두 평가한 **사용자의 집합**
     - $\vert U_{ij} \vert$ : 상품 i와 상품 j를 모두 평가한 **사용자의 수**
@@ -251,34 +251,34 @@
     - 벡터의 내적 공식으로부터 도출
     - **두 벡터가 같은 방향을 가리킬 수록, 즉 닮을 수록 코사인 유사도 값은 1에 가까워진다.**
 - `사용자 u, v간의 코사인 유사도`
-    - $\text{cosine_sim}(u, v) = \dfrac{\underset{i \in I_{uv}}{\sum} r(u,i) \cdot r(v,i)}{\sqrt{\underset{i \in I_{uv}}{\sum} r(u,i)^2} \cdot \sqrt{\underset{i \in I_{uv}}{\sum} r(v,i)^2}}$
+    - $\text{cosine sim}(u, v) = \dfrac{\underset{i \in I_{uv}}{\sum} r(u,i) \cdot r(v,i)}{\sqrt{\underset{i \in I_{uv}}{\sum} r(u,i)^2} \cdot \sqrt{\underset{i \in I_{uv}}{\sum} r(v,i)^2}}$
 - `상품 i, j간의 코사인 유사도`
-    - $\text{cosine_sim}(i, j) = \dfrac{\underset{u \in U_{ij}}{\sum} r(u,i) \cdot r(u,j)}{\sqrt{\underset{u \in U_{ij}}{\sum} r(u,i)^2} \cdot \sqrt{\underset{u \in U_{ij}}{\sum} r(u,j)^2}}$
+    - $\text{cosine sim}(i, j) = \dfrac{\underset{u \in U_{ij}}{\sum} r(u,i) \cdot r(u,j)}{\sqrt{\underset{u \in U_{ij}}{\sum} r(u,i)^2} \cdot \sqrt{\underset{u \in U_{ij}}{\sum} r(u,j)^2}}$
     
 ### 4-4. Pearson Similarity
 - `피어슨 유사도 Pearson Similarity` : 두 벡터의 상관계수(pearson correlation coefficient) 값을 의미한다.
 - `표본상관계수 sample correlation coefficient`
     - $r_{xy} = \dfrac{S_{x,y}}{\sqrt{S_x^2 \cdot S_y^2}} = \dfrac{\text{x,y의 공분산}}{\sqrt{\text{x의 분산} \cdot \text{y의 분산}}}$
-    - $\text{sample_covariance} = S_{x,y} = \dfrac{1}{N} \sum_{i=1}^{N} (x_i - \bar{x})(y_i - \bar{y})$
+    - $\text{sample covariance} = S_{x,y} = \dfrac{1}{N} \sum_{i=1}^{N} (x_i - \bar{x})(y_i - \bar{y})$
 - `사용자 u와 v 간의 피어슨 유사도`
-    - $\text{pearson_sim}(u, v) = \dfrac{\underset{i \in I_{uv}}{\sum} (r(u,i) - \mu(u)) \cdot (r(v,i) - \mu(v))}{\sqrt{\underset{i \in I_{uv}}{\sum} (r(u,i) - \mu(u))^2} \cdot \sqrt{\underset{i \in I_{uv}}{\sum} (r(v,i) - \mu(v))^2}}$
+    - $\text{pearson sim}(u, v) = \dfrac{\underset{i \in I_{uv}}{\sum} (r(u,i) - \mu(u)) \cdot (r(v,i) - \mu(v))}{\sqrt{\underset{i \in I_{uv}}{\sum} (r(u,i) - \mu(u))^2} \cdot \sqrt{\underset{i \in I_{uv}}{\sum} (r(v,i) - \mu(v))^2}}$
     - $\mu(u), \mu(v)$ : 사용자 u와 v가 매긴 평점 평균
 - `상품 i와 j간의 피어슨 유사도`
-    - $\text{pearson_sim}(i, j) = \dfrac{\underset{u \in U_{ij}}{\sum} (r(u,i) - \mu(i)) \cdot (r(u,j) - \mu(j))}{\sqrt{\underset{u \in U_{ij}}{\sum} (r(u,i) - \mu(i))^2} \cdot \sqrt{\underset{u \in U_{ij}}{\sum} (r(u,j) - \mu(j))^2}}$
+    - $\text{pearson sim}(i, j) = \dfrac{\underset{u \in U_{ij}}{\sum} (r(u,i) - \mu(i)) \cdot (r(u,j) - \mu(j))}{\sqrt{\underset{u \in U_{ij}}{\sum} (r(u,i) - \mu(i))^2} \cdot \sqrt{\underset{u \in U_{ij}}{\sum} (r(u,j) - \mu(j))^2}}$
     - $\mu(i), \mu(j)$ : 상품 i와 j가 받은 평점 평균
     
 ### 4-5. Pearson-Baseline Similarity
 - `피어슨-베이스라인 유사도 ` : 피어슨 유사도와 같이 상관계수를 구하지만, 각 벡터의 기댓값을 단순 평균이 아니라 베이스라인 모형(Baseline Model)에서 예측한 값을 사용한는 방법
     - **Baseline Model** : 추천시스템의 기본모형. 사용자 아이디 u와 상품 아이디 i, 두 카테고리 입력변수와 평점인 실수 종속변수 r(u, i)의 예측치 평점 $\hat{r}(u, i)$을 예측하는 회귀분석모형. 최적화를 통해 오차함수를 최소화하는 방식으로 계산된다.
 - `사용자 u, v 간의 msd(mean squared difference sim)` 
-    - $\text{pearson_baseline_sim}(u, v) = \hat{\rho}_{uv} = \dfrac{\underset{i \in I_{uv}}{\sum} (r(u,i) - b(u,i)) \cdot (r(v,i) - b(v,i))}{\sqrt{\underset{i \in I_{uv}}{\sum} (r(u,i) - b(u,i))^2} \cdot \sqrt{\underset{i \in I_{uv}}{\sum} (r(v,i) - b(v,i))^2}}$
+    - $\text{pearson baseline sim}(u, v) = \hat{\rho}_{uv} = \dfrac{\underset{i \in I_{uv}}{\sum} (r(u,i) - b(u,i)) \cdot (r(v,i) - b(v,i))}{\sqrt{\underset{i \in I_{uv}}{\sum} (r(u,i) - b(u,i))^2} \cdot \sqrt{\underset{i \in I_{uv}}{\sum} (r(v,i) - b(v,i))^2}}$
     - 피어슨 유사도와 구조는 같다. u와 v의 평점 평균 대신에 베이스라인 모형의 평점 조정값 b(u,i)와 b(v,i)가 사용된다.
 - `상품 i와 j 간의 msd(mean squared difference sim)`
-    - $\text{pearson_baseline_sim}(i, j) = \hat{\rho}_{ij} = \dfrac{\underset{u \in U_{ij}}{\sum} (r(u,i) - b(u,i)) \cdot (r(u,j) - b(u,j))}{\sqrt{\underset{u \in U_{ij}}{\sum} (r(u,i) - b(u,i))^2} \cdot \sqrt{\underset{u \in U_{ij}}{\sum} (r(u,j) - b(u,j))^2}}$
+    - $\text{pearson baseline sim}(i, j) = \hat{\rho}_{ij} = \dfrac{\underset{u \in U_{ij}}{\sum} (r(u,i) - b(u,i)) \cdot (r(u,j) - b(u,j))}{\sqrt{\underset{u \in U_{ij}}{\sum} (r(u,i) - b(u,i))^2} \cdot \sqrt{\underset{u \in U_{ij}}{\sum} (r(u,j) - b(u,j))^2}}$
     - 피어슨 유사도와 구조는 같다. i와 j의 평점 평균 대신에 베이스라인 모형의 평점 조정값 b(u,i)와 b(u,j)가 사용된다.
 - `shrinkage 정규화` : 피어슨-베이스라인 모형을 두 사용자간 또는 두 상품간의 평점 중 같은 평점 원소의 갯수를 이용하여 정규화하는 방법
-    - $\text{pearson_baseline_shrunk_sim}(u,v) = \dfrac{{\vert I_{uv} \vert} - 1}{{\vert I_{uv} \vert} - 1 + \text{shrinkage}} \cdot \hat{\rho}_{uv}$
-    - $\text{pearson_baseline_shrunk_sim}(i,j) = \dfrac{{\vert U_{ij} \vert} - 1}{{\vert U_{ij} \vert} - 1 + \text{shrinkage}} \cdot \hat{\rho}_{ij}$
+    - $\text{pearson baseline shrunksim}(u,v) = \dfrac{{\vert I_{uv} \vert} - 1}{{\vert I_{uv} \vert} - 1 + \text{shrinkage}} \cdot \hat{\rho}_{uv}$
+    - $\text{pearson baseline shrunk sim}(i,j) = \dfrac{{\vert U_{ij} \vert} - 1}{{\vert U_{ij} \vert} - 1 + \text{shrinkage}} \cdot \hat{\rho}_{ij}$
     
 ## 5. KNN 가중치 예측 방법
 - `KNN 기반 예측 방법 K Nearest Neighbors` : 이웃기반협업필터링 Neighborhood Filtering 방법의 가중치 예측 방법에 해당한다. 평점을 구하고자 하는 사용자(또는 상품)의 유사도를 구한 뒤 유사도가 큰 k개의 사용자(또는 상품) 벡터를 사용하여 가중 평균을 구해서 가중치를 예측하는 방법.
