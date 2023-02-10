@@ -788,6 +788,44 @@ Index(['budget', 'genres', 'homepage', 'id', 'keywords', 'original_language',
       dtype='object')
 ```
 
+#### 결측 데이터 확인
+- homepage, tagline 컬럼에 결측 데이터가 많다.
+- 현재 분석에 영향을 주진 않는다.
+- isnull() 명령을 사용하면 True, False 값으로 반환된다.
+
+```python
+mv_df.isnull()
+```
+![reco_30.png](./images/reco_30.png)
+
+- isnull().sum() : T, F 데이터의 합을 계산하면 결측 데이터(True)의 갯수를 알 수 있다.
+
+```python
+mv_df.isnull().sum()
+```
+![reco_31.png](./images/reco_31.png)
+
+
+- missingno 패키지로 결측 데이터 확인
+    - 결측 데이터를 그래프로 확인 할 수 있다.
+
+```python
+import missingno as msno
+
+msno.matrix(mv_df)
+plt.show() ;
+```
+![reco_32.png](./images/reco_32.png)
+
+- 막대 그래프로 결측 데이터 확인
+
+```python
+msno.bar(mv_df)
+plt.show() ;
+```
+![reco_33.png](./images/reco_33.png)
+
+
 ### 7-2. 컬럼 선택
 - 분석에 사용할 컬럼 선택
 
@@ -800,12 +838,22 @@ mv.head(3)
 ![reco_16.png](./images/reco_16.png)
 
 
-### 7-3. genres, keywords 컬럼 전처리
-- literal_eval 함수 사용
+### 7-3. 코사인 유사도를 적용할 genres 컬럼과 keywords 컬럼 전처리
+- genres와 keywords 데이터는 str 안에 다른 자료형의 데이터가 들어 있다.
+    - '[{}, {}, {}]' : str 안에 list가 있고 list 안에 dict 가 있다. 
+    - dict 안에 id와 name key와 이에 대응하는 value 가 있다.
+    - **name의 값으로 코사인 유사도를 측정한다.**
+- literal_eval 함수
+    - apply 함수에 적용하여 str 안의 자료형을 선택한다.
 - str로 만들어진 list, dict, tuple 데이터 타입을 원래의 데이터 타입으로 변환한다.
     - "[]" -> []
     - "()" -> ()
     - "{}" -> {}
+- 리스트 컴프리핸션
+    - list안의 dict에서 name key에 해당하는 value를 선택한다.
+- join 함수
+    - genre와 keywords의 데이터를 공백으로 연결 된 한 문장으로 만들어 준다.
+    - countverctorizer의 input 데이터로 사용할 수 있다.    
 
 ```python
 from ast import literal_eval
@@ -932,6 +980,9 @@ mv.head(3)
 
 ### 7-6. genres의 데이터를 하나의 문장으로 변환
 - list 안에 str로 구분된 데이터를 join() 함수를 사용하여 하나의 문장 형식으로 변환
+    - ['a', 'b', 'c'] -> 'a b c'
+    - 공백 사이에 , 없음
+
 
 ```python
 mv["genres"][0]
@@ -966,6 +1017,8 @@ mv.head(3)
     - A 말뭉치가 다른 말뭉치 B, C와 쓰였다면
     - ngram_range=(1, 2) 값 설정
     - 'A', 'A, B', 'A, C' 로 구분 해 준다.
+- 어떤 문장에 이 패턴에 해당하는 것이 있으면 해당 인덱스에 1 값이 저장 된다.
+    - 희소행렬로 코사이 유사도 즉 문장과 문장의 거리를 계산할 수 있다.    
 - 순서
     - 모델 생성 : CountVectorizer(min_df=0, ngram_range=(1, 2))
     - 모델 훈련 : count_vect.fit_transform(mv["genres_literal"])
@@ -1171,7 +1224,8 @@ array(['action', 'action adventure', 'adventure', 'adventure fantasy',
 - genre_mat의 희소행렬 toarray()의 모든 행을 다른 행들과의 코사인 유사도를 계산한다.
     - 문장과 문자의 거리
     - 1에 가까울 수록 유사도가 크다. 
-    - 자기자신과의 거리는 1 
+- (4083, 276) 행렬이 -> (4083, 4083) 정방행렬이 된다.    
+- 자기자신과의 거리는 1 
     - 문장을 벡터화 했을 때 두 벡터가 같다면 같은 방향을 향한다.    
 
 - 코사인 유사도 패키지 임포트
@@ -1315,7 +1369,12 @@ test_recommend["genres_literal"]
 Name: genres_literal, dtype: object
 ```
 
-### 7-14. 유사한 영화를 추천하는 과정을 하나의 함수로 만들기
+### 7-14. 추천 영화를 DataFrame으로 반환하는 함수
+- 영화의 타이틀을 입력하면
+- 타이틀에 해당하는 인덱스를 찾아서
+- 코사인 유사도 행렬에서 해당 인덱스의 값을 확인한다.
+- 이중에서 코사인 유사도가 가장 큰 값 즉 벡터가 가장 유사한 인덱스 n개를 반환한다.
+- 이 인덱스에 해당하는 타이틀을 검색하면 유사한 영화가 된다.
 
 ```python
 def find_sim_mv(df, title, sorted_ind, top_n=10) :
