@@ -1,11 +1,53 @@
-# 추천시스템 실습 : 카운트 벡터와 코사인 유사도를 사용한 영화 추천
+# 추천시스템 : 카운트 벡터와 코사인 유사도를 사용한 영화 추천
 - 영화 평점데이터를 사용한 추천 시스템
     - 장르 데이터를 전처리하여
     - countvectorizer로 희소행렬로 변환하고
     - cosine_similarity로 유사도를 측정
 
+## 1. 요약
 
-### 7-1. 데이터 임포트
+### 1-1. 평점 데이터를 사용한 추천 시스템
+- 데이터 전처리
+- R 매트릭스 생성
+    - 유저 아이디와 아이템 아이디로 이루어진 매트릭스
+    - pivot_table("rating", index="userId", columns="itemId 또는 타이틀")
+- 희소행렬 생성
+    - R 매트릭스를 사용하는 경우 R 매트릭스가 희소행렬 역할을 한다.
+- 유사도 측정
+    - cosine_similarity(r_matrix, r_matrix)
+- 유사도 값이 큰 순서로 인덱스 반환
+- 인덱스에 해당하는 책 정보 반환
+
+
+### 1-2. 데이터 전처리
+- **countvectorizer를 사용하여 희소행렬의 형태로 만들기 위해 데이터를 한 문장으로 만들어 준다.**
+- str 안에 다른 [{}, {}] 형태의 자료형이 있는 경우
+    - from ast import literal_eval
+    - apply(literal_eval)
+- dict의 특정 값만 꺼내는 경우    
+    - apply(lambda x : [ele["name"] for ele in x])
+- ["a", "b"]를 "a b" 공백으로 구분된 한 문장으로 변환    
+    - apply(lambda x : (" ").join(x))
+
+### 1-3. countvectorizer
+- 문장을 희소행렬 화 한다.
+    - from sklearn.feature_extraction.text import CountVectorizer
+    - 모델 생성 : count_vect = CountVectorizer(min_df=0, ngram_range=(1, 2))
+    - 모델 학습 : genres_matrix = count_vect.fit_transform(data)
+    - feature_names : count_vect.get_feature_names()
+    - toarray : genres_matrix.toarray()
+
+### 1-4. 코사인 유사도 계산
+- 희소행렬의 코사인 유사도 계산
+- 각 행별로 다른 모든 행과의 유사도를 계산하여 유사도 값을 반환한다.
+    - from sklearn.metrics.pairwise import cosine_similarity
+    - sim_scores = cosine_similarity(genres_matrix, genres_matrix)
+- 희소행렬을 크기가 큰 값의 인덱스 순서로 정렬한다.
+    - sim_scores.argsort()[:, ::-1]
+
+## 2. Python
+
+### 2-1. 데이터 임포트
 
 ```python
 mv_df = pd.read_csv("../../04_machine_learning/tmdb-movie-metadata/\
@@ -83,7 +125,7 @@ plt.show() ;
 ![reco_33.png](./images/reco_33.png)
 
 
-### 7-2. 컬럼 선택
+### 2-2. 컬럼 선택
 - 분석에 사용할 컬럼 선택
 
 ```python
@@ -95,7 +137,7 @@ mv.head(3)
 ![reco_16.png](./images/reco_16.png)
 
 
-### 7-3. 코사인 유사도를 적용할 genres 컬럼과 keywords 컬럼 전처리
+### 2-3. 코사인 유사도를 적용할 genres 컬럼과 keywords 컬럼 전처리
 - genres와 keywords 데이터는 str 안에 다른 자료형의 데이터가 들어 있다.
     - '[{}, {}, {}]' : str 안에 list가 있고 list 안에 dict 가 있다. 
     - dict 안에 id와 name key와 이에 대응하는 value 가 있다.
@@ -150,7 +192,7 @@ print(type(code2), type(code_eval))
 <class 'str'> <class 'list'>
 ```
 
-### 7-4. literal_eval 함수를 사용하여 데이터 전처리
+### 2-4. literal_eval 함수를 사용하여 데이터 전처리
 - genres와 keywords의 str 데이터를 list와 dict로 변환
     - mv["genres"].apply(literal_eval)
 
@@ -199,7 +241,7 @@ print("변환후 type : {}".format(type(mv["genres"][0])))
 변환후 type : <class 'list'>
 ```
 
-### 7-5. apply(lambda x : 리스트컴프리핸션)으로 dict의 value 값을 특성으로 사용할 수 있도록 변환
+### 2-5. apply(lambda x : 리스트컴프리핸션)으로 dict의 value 값을 특성으로 사용할 수 있도록 변환
 - list 안에 dict 형태로 되어 있는 데이터에서 특정 value 값만 선택하는 방법
     - lambda() 함수를 사용
     - [{"id" : 123, "name" : "hong"}, {"id" : 0909, "name" : "kim"}]
@@ -235,7 +277,7 @@ mv.head(3)
 ![reco_18.png](./images/reco_18.png)
 
 
-### 7-6. genres의 데이터를 하나의 문장으로 변환
+### 2-6. genres의 데이터를 하나의 문장으로 변환
 - list 안에 str로 구분된 데이터를 join() 함수를 사용하여 하나의 문장 형식으로 변환
     - ['a', 'b', 'c'] -> 'a b c'
     - 공백 사이에 , 없음
@@ -265,7 +307,7 @@ mv.head(3)
 ```
 ![reco_19.png](./images/reco_19.png)
 
-### 7-7. 문자열로 변환된 genres를 countvectorize 수행
+### 2-7. 문자열로 변환된 genres를 countvectorize 수행
 - genres_literal 컬럼의 데이터는 띄어쓰기로 이어져 있는 str 타입
     - Action Adventure Fantasy Science Fiction
 - 이렇게 변환 시키는 이유는 **countvectorizer**를 사용하기 위함
@@ -350,7 +392,7 @@ len(genre_lst)
 20
 ```
 
-### 7-8. countvectorizer의 ngram_range 결과
+### 2-8. countvectorizer의 ngram_range 결과
 - action 장르가 다른 장르와 함께 사용 된 경우
     - 다른 15개 장르와 함께 사용 됨
     - adventure animation comedy crime drama family fantasy history horror mystery romance science thriller war western
@@ -399,7 +441,7 @@ len(count_vect.get_feature_names())
  'western']
 ```
 
-### 7-9. ngram_range 테스트
+### 2-9. ngram_range 테스트
 - ngram_range=(1, 3)으로 설정하면 하나의 장르가 2개의 장르와의 조합으로 나타난다.
 
 ```python
@@ -410,7 +452,7 @@ test_countvect.get_feature_names()[:15]
 ```
 ![reco_21.png](./images/reco_21.png)
 
-### 7-10. toarray() 희소행렬에는 원래 특성이 들어있는 feature_name에 1이 마킹된다.
+### 2-10. toarray() 희소행렬에는 원래 특성이 들어있는 feature_name에 1이 마킹된다.
 - count_vect.toarray()의 모양은 (4803, 276) 이다.
     - 컬럼의 갯수가 276 인 이유는 ngram_range=(1, 2)로 설정했기때문에, 각각의 장르가 2개의 짝을 이루는 형태로 만들어졌기 때문
     
@@ -477,7 +519,7 @@ array(['action', 'action adventure', 'adventure', 'adventure fantasy',
        'science fiction'], dtype='<U21')
 ```
 
-### 7-11. 코사인 유사도
+### 2-11. 코사인 유사도
 - genre_mat의 희소행렬 toarray()의 모든 행을 다른 행들과의 코사인 유사도를 계산한다.
     - 문장과 문자의 거리
     - 1에 가까울 수록 유사도가 크다. 
@@ -543,7 +585,7 @@ array([[1.        , 0.59628479, 0.4472136 ],
        [0.4472136 , 0.4       , 1.        ]])
 ```
 
-### 7-12. 코사인 유사도를 큰 값 순으로 인덱스값으로 정렬
+### 2-12. 코사인 유사도를 큰 값 순으로 인덱스값으로 정렬
 - argsort() : 작은 값의 인덱스가 배열의 가장 앞에 온다.
 - [:, ::-1] : 행은 그대로 두고, 열의 값을 역순으로 정렬하면 큰 값이 배열의 앞으로 온다.
 
@@ -562,7 +604,7 @@ array([[   0, 3494,  813, ..., 3038, 3037, 2401],
        [4802, 4710, 4521, ..., 3140, 3141,    0]], dtype=int64)
 ```
 
-### 7-13. 추천 영화를 DataFrame으로 반환하는 함수
+### 2-13. 추천 영화를 DataFrame으로 반환하는 함수
 - 영화의 타이틀을 입력하면
 - 타이틀에 해당하는 인덱스를 찾아서
 - 코사인 유사도 행렬에서 해당 인덱스의 값을 확인한다.
@@ -626,7 +668,7 @@ test_recommend["genres_literal"]
 Name: genres_literal, dtype: object
 ```
 
-### 7-14. 추천 영화를 DataFrame으로 반환하는 함수
+### 2-14. 추천 영화를 DataFrame으로 반환하는 함수
 - 영화의 타이틀을 입력하면
 - 타이틀에 해당하는 인덱스를 찾아서
 - 코사인 유사도 행렬에서 해당 인덱스의 값을 확인한다.
@@ -651,7 +693,7 @@ find_sim_mv(mv, "Inception", genre_sim_sorted_ind, 10)
 ![reco_24.png](./images/reco_24.png)
 
 
-### 7-15. vote_count의 평균값에 가장 가까운 영화를 조회하고 유사한 영화들 추천
+### 2-15. vote_count의 평균값에 가장 가까운 영화를 조회하고 유사한 영화들 추천
 - 평점의 평균
 
 ```python
@@ -700,7 +742,7 @@ find_sim_mv(mv, new_title, genre_sim_sorted_ind, 10)
 ![reco_25.png](./images/reco_25.png)
 
 
-### 7-16. 코사인 유사도 값을 반환하도록 함수 변경
+### 2-16. 코사인 유사도 값을 반환하도록 함수 변경
 
 ```python
 def find_sim_mv_2(df, title, sorted_idx, cosine_sim, top_n=10) :
@@ -727,12 +769,12 @@ find_sim_mv_2(mv, new_title, genre_sim_sorted_ind, genre_sim, 10)
 ![reco_26.png](./images/reco_26.png)
 
 
-## 8. 평점에 가중치를 적용하여 새로운 평점 생성
+## 3. 평점에 가중치를 적용하여 새로운 평점 생성
 - 그러나 이 값이 코사인 유사도와는 별개이므로 추천 영화 자체에 영향을 주진 않는다.
     - 코사인 값은 평점에 따른 것이 아니라 장르 벡터에 따른 것이므로
 - 코사인 유사도 값이 높은 10개 중에서 가중치 평점에 따라 정렬하더라도 큰 변화는 없다.
 
-### 8-1. 평점 횟수와 평점 간의 관계가 기울어진 데이터
+### 3-1. 평점 횟수와 평점 간의 관계가 기울어진 데이터
 - 평점 횟수가 1인데 10점인 것과 평점 횟수가 8205인데 평점이 8.5 인 것의 가중치는 달라야 함
 
 ```python
@@ -741,7 +783,7 @@ mv[["title", "vote_average", "vote_count"]].sort_values("vote_average", ascendin
 ![reco_27.png](./images/reco_27.png)
 
 
-### 8-2. 영화 평점 가중치 부여하기
+### 3-2. 영화 평점 가중치 부여하기
 - v : 개별 영화에 평점을 투표한 횟수
 - m : 평점을 부여하기 위한 최소 투표 횟수
     - quantile() : 함수를 사용하여 사분위수를 구할 수 있다.
@@ -786,7 +828,7 @@ mv.head(3)
 ![reco_28.png](./images/reco_28.png)
 
 
-### 8-3. 조정 평점값을 적용한 데이터로 다시 유사 영화 추천
+### 3-3. 조정 평점값을 적용한 데이터로 다시 유사 영화 추천
 - 추천 시스템 함수에서 조정 평점값 컬럼을 기준으로 정렬한 후 반환 한다.
 
 ```python
@@ -811,60 +853,4 @@ recommed_mv_2 = find_sim_mv_3(mv, new_title, genre_sim_sorted_ind, genre_sim, 10
 recommed_mv_2[["title", "vote_average", "weighted_vote_60", "sim_score"]]
 ```
 ![reco_29.png](./images/reco_29.png)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
