@@ -677,3 +677,340 @@ compered_result.fillna("")
 ![reco_65.png](./images/reco_65.png)
 
 
+### 12. SVD 를 사용한 평점 예측 다른 접근 방법
+- 다른 사람이 만든 SVD 추천 시스템
+- 데이터 전처리 과정이 간결하다.
+
+### 12-1. user 9의 평점 영화 아이디 조회
+- 인덱스와 영화 아이디
+
+```python
+movieIds = ratings_df[ratings_df["userId"]==9]["movieId"]
+movieIds
+
+>>> print
+
+1073      41
+1074     187
+1075     223
+1076     371
+1077     627
+1078     922
+1079     923
+1080    1037
+1081    1095
+1082    1198
+1083    1270
+1084    1674
+...
+```
+
+### 12-2. user 9가 movie 42를 평가했는지 확인
+
+```python
+if movieIds[movieIds==42].count() == 0 :
+    print("user id=9 인 사람은 movie id=42에 대한 평점이 없음")
+
+>>> print
+
+user id=9 인 사람은 movie id=42에 대한 평점이 없음
+```
+
+### 12-3. movie 42의 데이터 확인
+
+```python
+print(movies_df[movies_df["movieId"]==41])
+
+>>> print
+
+    movieId               title     genres
+37       41  Richard III (1995)  Drama|War
+```
+
+### 12-4. 유저간 본 영화의 아이디 리스트
+- 유저가 본 영화 = 유저가 평가한 영화
+- tolist() : 시리즈 데이터에서 value 만 리스트에 담을 수 있다.
+
+```python
+user_id = 9
+seen_movies = ratings_df[ratings_df["userId"]==user_id]["movieId"].tolist()
+seen_movies
+
+>>> print
+
+[41,
+ 187,
+ 223,
+ 371,
+ 627,
+ 922,
+ 923,
+ 1037,
+ 1095,
+ 1198,
+ 1270,
+ 1674,
+ 1987,
+ 2011,
+...]
+```
+
+### 12-5. 전체 영화 아이디 리스트
+
+```python
+total_movies = movies_df["movieId"].tolist()
+total_movies
+
+>>> print
+
+[1,
+ 2,
+ 3,
+ 4,
+ 5,
+ 6,
+ 7,
+ 8,
+ 9,
+ 10,
+ 11,
+ 12,
+ 13,
+ 14,
+ 15,
+ 16,
+ ...]
+```
+
+### 12-6. 안 본 영화 아이디 리스트
+- 안 본 영화 = 평가 하지 않은 영화
+- not in 명령어를 사용하여 전체 영화 리스트에서 본 영화 리스트를 제외 한다.
+
+```python
+unseen_movies = [movie for movie in total_movies if movie not in seen_movies]
+unseen_movies
+
+>>> print
+
+[1,
+ 2,
+ 3,
+ 4,
+ 5,
+ 6,
+ 7,
+ 8,
+ 9,
+ 10,
+ 11,
+ 12,
+ 13,
+ 14,
+ 15,
+ 16,
+ ...]
+```
+
+#### user 9가 본 영화와 안 본 영화의 갯수 확인
+
+```python
+print(f"특정 {user_id} 번 유저가 본 영화 수 : {len(seen_movies)} \n추천한 영화 개수 : {len(unseen_movies)} \n전체 영화 개수 : {len(total_movies)}")
+
+>>> print
+
+특정 9 번 유저가 본 영화 수 : 46
+추천한 영화 개수 : 9696
+전체 영화 개수 : 9742
+```
+
+### 12-7. SVD 모델을 사용하여 안 본 영화에 대한 유저의 평점 예측
+
+```python
+predictions = [algo.predict(str(user_id), str(movieid)) for movieid in unseen_movies]
+predictions
+
+>>> print
+
+[Prediction(uid='9', iid='1', r_ui=None, est=3.7274017589240866, details={'was_impossible': False}),
+ Prediction(uid='9', iid='2', r_ui=None, est=3.3175046275499094, details={'was_impossible': False}),
+ Prediction(uid='9', iid='3', r_ui=None, est=3.031871253227389, details={'was_impossible': False}),
+ Prediction(uid='9', iid='4', r_ui=None, est=2.558235328308027, details={'was_impossible': False}),
+ ...]
+```
+
+### 12-8. 예측 데이터에서 평점 예측값 만을 선택하는 함수
+
+```python
+def sortkey_est(pred) :
+    return pred.est    
+```
+
+- 함수 호출
+
+```python
+sortkey_est(predictions[0])
+
+>>> print
+
+3.7274017589240866
+```
+
+### 12-9. 예측 데이터를 정렬하면서 함수를 적용하는 방법
+- sort() 함수의 인수를 사용하여, 특정값 기준으로 정렬을 할 수 있다.
+- 예측 평점 값이 est 가 큰 순서데로 정렬 해준다.
+- **prediction 데이터에서 est를 꺼내고 다시 정렬하고 uesr id, item id와 병합하는 과정을 줄일 수 있다.**
+
+```python
+predictions.sort(key=sortkey_est, reverse=True)
+predictions
+
+>>> print
+
+[Prediction(uid='9', iid='58559', r_ui=None, est=4.145334900286058, details={'was_impossible': False}),
+ Prediction(uid='9', iid='720', r_ui=None, est=4.107206216213534, details={'was_impossible': False}),
+ Prediction(uid='9', iid='50', r_ui=None, est=4.103412145894, details={'was_impossible': False}),
+ Prediction(uid='9', iid='1104', r_ui=None, est=4.086215804990953, details={'was_impossible': False}),
+ ...]
+```
+
+### 12-10. 예측 평점값이 높은 영화 10개
+
+```python
+top_predictions = predictions[:10]
+top_predictions
+
+>>> print
+
+[Prediction(uid='9', iid='58559', r_ui=None, est=4.145334900286058, details={'was_impossible': False}),
+ Prediction(uid='9', iid='720', r_ui=None, est=4.107206216213534, details={'was_impossible': False}),
+ Prediction(uid='9', iid='50', r_ui=None, est=4.103412145894, details={'was_impossible': False}),
+ Prediction(uid='9', iid='1104', r_ui=None, est=4.086215804990953, details={'was_impossible': False}),
+ Prediction(uid='9', iid='78499', r_ui=None, est=4.080107919919996, details={'was_impossible': False}),
+ Prediction(uid='9', iid='1219', r_ui=None, est=4.076452047465342, details={'was_impossible': False}),
+ Prediction(uid='9', iid='8368', r_ui=None, est=4.06964879436198, details={'was_impossible': False}),
+ Prediction(uid='9', iid='246', r_ui=None, est=4.066860202700719, details={'was_impossible': False}),
+ Prediction(uid='9', iid='1261', r_ui=None, est=4.059123046425133, details={'was_impossible': False}),
+ Prediction(uid='9', iid='318', r_ui=None, est=4.057630154572263, details={'was_impossible': False})]
+```
+
+### 12-11. 예측 평점이 높은 영화의 아이디
+
+```python
+top_movie_ids = [int(pred.iid) for pred in top_predictions]
+top_movie_ids
+
+>>> print
+
+[58559, 720, 50, 1104, 78499, 1219, 8368, 246, 1261, 318]
+```
+
+### 12-12. 높은 예측 평점 10개
+
+```python
+top_movie_ratings = [pred.est for pred in top_predictions]
+top_movie_ratings
+
+>>> print
+
+[4.145334900286058,
+ 4.107206216213534,
+ 4.103412145894,
+ 4.086215804990953,
+ 4.080107919919996,
+ 4.076452047465342,
+ 4.06964879436198,
+ 4.066860202700719,
+ 4.059123046425133,
+ 4.057630154572263]
+```
+
+### 12-13. 예측 평점이 높은 영화의 제목
+
+```python
+top_movie_titles = movies_df[movies_df["movieId"].isin(top_movie_ids)]["title"]
+top_movie_titles
+
+>>> print
+
+46                             Usual Suspects, The (1995)
+210                                    Hoop Dreams (1994)
+277                      Shawshank Redemption, The (1994)
+585     Wallace & Gromit: The Best of Aardman Animatio...
+841                      Streetcar Named Desire, A (1951)
+920                                         Psycho (1960)
+960                    Evil Dead II (Dead by Dawn) (1987)
+5166      Harry Potter and the Prisoner of Azkaban (2004)
+6710                              Dark Knight, The (2008)
+7355                                   Toy Story 3 (2010)
+Name: title, dtype: object
+```
+
+### 12-14. 예측 평점이 높은 영화 아이디, 평점, 제목을 list(tuple) 에 담기
+- 서로 다른 데이터 프레임에 있는 데이터를 함께 사용해야 하는 경우 list(tuple)에 저장하면 간편하게 사용할 수 있다.
+
+```python
+top_movie_preds = [(ids, rating, title) for ids, rating, title in \
+                   zip(top_movie_ids, top_movie_ratings, top_movie_titles)]
+top_movie_preds
+
+>>> print
+
+[(58559, 4.145334900286058, 'Usual Suspects, The (1995)'),
+ (720, 4.107206216213534, 'Hoop Dreams (1994)'),
+ (50, 4.103412145894, 'Shawshank Redemption, The (1994)'),
+ (1104,
+  4.086215804990953,
+  'Wallace & Gromit: The Best of Aardman Animation (1996)'),
+ (78499, 4.080107919919996, 'Streetcar Named Desire, A (1951)'),
+ (1219, 4.076452047465342, 'Psycho (1960)'),
+ (8368, 4.06964879436198, 'Evil Dead II (Dead by Dawn) (1987)'),
+ (246, 4.066860202700719, 'Harry Potter and the Prisoner of Azkaban (2004)'),
+ (1261, 4.059123046425133, 'Dark Knight, The (2008)'),
+ (318, 4.057630154572263, 'Toy Story 3 (2010)')]
+```
+
+### 12-15. user 9에 대한 추천 영화 확인
+
+```python
+print("#"*8, "Top-10 추천 영화 리스트", "#"*8)
+print()
+for top_movie in top_movie_preds :
+    print("* 추천 영화 이름 : ", top_movie[2])
+    print("* 해당 영화의 예측평점 : ", top_movie[1])
+    print()
+
+>>> print
+
+######## Top-10 추천 영화 리스트 ########
+
+* 추천 영화 이름 :  Usual Suspects, The (1995)
+* 해당 영화의 예측평점 :  4.145334900286058
+
+* 추천 영화 이름 :  Hoop Dreams (1994)
+* 해당 영화의 예측평점 :  4.107206216213534
+
+* 추천 영화 이름 :  Shawshank Redemption, The (1994)
+* 해당 영화의 예측평점 :  4.103412145894
+
+* 추천 영화 이름 :  Wallace & Gromit: The Best of Aardman Animation (1996)
+* 해당 영화의 예측평점 :  4.086215804990953
+
+* 추천 영화 이름 :  Streetcar Named Desire, A (1951)
+* 해당 영화의 예측평점 :  4.080107919919996
+
+* 추천 영화 이름 :  Psycho (1960)
+* 해당 영화의 예측평점 :  4.076452047465342
+
+* 추천 영화 이름 :  Evil Dead II (Dead by Dawn) (1987)
+* 해당 영화의 예측평점 :  4.06964879436198
+
+* 추천 영화 이름 :  Harry Potter and the Prisoner of Azkaban (2004)
+* 해당 영화의 예측평점 :  4.066860202700719
+
+* 추천 영화 이름 :  Dark Knight, The (2008)
+* 해당 영화의 예측평점 :  4.059123046425133
+
+* 추천 영화 이름 :  Toy Story 3 (2010)
+* 해당 영화의 예측평점 :  4.057630154572263
+```
+
