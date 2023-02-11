@@ -1,4 +1,4 @@
-# 추천 시스템
+# surprise 패키지 기반 추천 시스템
 - `모형`
     - 1) 베이스라인 모형 (Baseline Model) : 추천 시스템의 기본 모형
     - 2) 협업 필터링 모형 (Collaborative Filtering)
@@ -45,7 +45,11 @@
     - 교차검증 : surprise 패키지의 model_selection 서브패키지에서 사용 가능
         - **from surprise.model_selection import cross_validate**
         - **cross_validate(model, data, maesures=["rmse", "mae", "fcp"])**
-    
+
+#### 추천 시스템의 방법론
+- 희소행렬(sparse matrix)을 surprise 패키지를 사용하거나 유사도 측정 패키지를 사용하여 유사값을 구한다. 
+
+
 ## 1. 추천 시스템
 - `추천 시스템 Recommender System` : 사용자(user)가 선호하는 상품(Item)을 예측하는 시스템
     - 사용자가 아이템에 대해서 평가한 점수를 기반으로 예측한다.
