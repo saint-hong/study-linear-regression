@@ -48,7 +48,9 @@
 
 #### 추천 시스템의 방법론
 - 희소행렬(sparse matrix)을 surprise 패키지를 사용하거나 유사도 측정 패키지를 사용하여 유사값을 구한다. 
+    - 일반 데이터는 tfidf, countvect를 사용하거나 평점 데이터를 만들어 희소행렬로 변환해준다.
 
+![reco_54.png](./images/reco_54.png)    
 
 ## 1. 추천 시스템
 - `추천 시스템 Recommender System` : 사용자(user)가 선호하는 상품(Item)을 예측하는 시스템
