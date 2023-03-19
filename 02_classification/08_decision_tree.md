@@ -32,7 +32,8 @@
     - 조건부엔트로피 값이 낮을 수록 X로 Y를 예측하는데 더 도움이 된다는 의미
 
 ## 5. 확률론과 엔트로피 요약
-- math -> 12.entropy
+- **수학 요약 중 12번 엔트로피에 상세 요약**
+    - math -> 12.entropy
     - https://github.com/saint-hong/study-math/blob/main/12_entropy.md
 
 ### 5-1. 엔트로피의 의미
