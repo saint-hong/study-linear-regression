@@ -723,23 +723,622 @@ np.max(mean_test_score)
 0.8260247316552632
 ```
 
+## 2. 의사결정나무 실험 : 유방암 환자 이미지값 데이터
+- scikit learn의 breast cancer 데이터 
+
+### 2-1. 데이터 임포트
+- 유방 덩어리의 미세한 바늘 흡인의 디지털 이미지값
+- 세포핵의 특성을 설명하는 데이터들이다.
+    - radius (mean of distances from center to points on the perimeter)
+    - texture (standard deviation of gray-scale values)
+    - perimeter
+    - area
+    - smoothness (local variation in radius lengths)
+    - compactness (perimeter^2 / area - 1.0)
+    - concavity (severity of concave portions of the contour)
+    - concave points (number of concave portions of the contour)
+    - symmetry
+    - fractal dimension ("coastline approximation" - 1)
+
+#### 데이터 레퍼런스
+
+```python
+from sklearn.datasets import load_breast_cancer
+
+bc = load_breast_cancer()
+print(bc.DESCR)
+```
+![dt17.png](./images/dt/dt17.png)
+
+#### 학습 데이터 생성
+
+```python
+X = bc.data
+y = bc.target
+dfX = pd.DataFrame(bc.data, columns=bc.feature_names)
+dfy = pd.DataFrame(bc.target, columns=["class"])
+df = pd.concat([dfX, dfy], axis=1)
+df.head(2)
+```
+![dt18.png](./images/dt/dt18.png)
 
 
+### 2-2. 데이터 EDA
+- 독립변수는 기본 이미지 데이터 값에 대한 mean, error, worst 통계값으로 이루어져 있다.
+
+#### 데이터 정보
+
+```python
+df.info()
+```
+![dt19.png](./images/dt/dt19.png)
+
+#### 데이터 통계값
+
+```python
+df.describe()
+```
+![dt20.png](./images/dt/dt20.png)
 
 
+### 2-3. 결측 데이터 측정
+- 결측 데이터 없음
+
+#### missingno 패키지로 결측 데이터 시각화
+
+```python
+import missingno as msno
+
+msno.bar(dfX)
+```
+![dt21.png](./images/dtdt21.png)
 
 
+#### 컬럼별 결측 데이터 갯수 측정
+
+```python
+df.isna().sum()
+
+>>> print
+
+mean radius                0
+mean texture               0
+mean perimeter             0
+mean area                  0
+mean smoothness            0
+mean compactness           0
+mean concavity             0
+mean concave points        0
+mean symmetry              0
+mean fractal dimension     0
+radius error               0
+texture error              0
+perimeter error            0
+area error                 0
+smoothness error           0
+compactness error          0
+concavity error            0
+concave points error       0
+symmetry error             0
+fractal dimension error    0
+worst radius               0
+worst texture              0
+worst perimeter            0
+worst area                 0
+worst smoothness           0
+worst compactness          0
+worst concavity            0
+worst concave points       0
+worst symmetry             0
+worst fractal dimension    0
+class                      0
+dtype: int64
+```
+
+#### 유니크 값의 갯수 측정
+- 모든 독립변수가 실수형 데이터 이다.
+
+```python
+df.apply(lambda x : x.nunique())
+
+>>> print
+
+mean radius                456
+mean texture               479
+mean perimeter             522
+mean area                  539
+mean smoothness            474
+mean compactness           537
+mean concavity             537
+mean concave points        542
+mean symmetry              432
+mean fractal dimension     499
+radius error               540
+texture error              519
+perimeter error            533
+area error                 528
+smoothness error           547
+compactness error          541
+concavity error            533
+concave points error       507
+symmetry error             498
+fractal dimension error    545
+worst radius               457
+worst texture              511
+worst perimeter            514
+worst area                 544
+worst smoothness           411
+worst compactness          529
+worst concavity            539
+worst concave points       492
+worst symmetry             500
+worst fractal dimension    535
+class                        2
+dtype: int64
+```
+
+### 2-3. 독립변수의 분포 box plot
+- 독립변수 별 스케일이 다르다.
+- 선형회귀분석에서는 스케일이 다른 경우 회귀분석 결과의 큰 영향을 미친다.
+- **의사결정나무와 같은 분류 예측 판별모형과 같은 모델은 어떤 관계가 있을까?**
+
+#### box plot
+- area 값의 최대최소값이 크다
+
+```python
+plt.figure(figsize=(10, 15))
+plt.subplot(311)
+plt.boxplot(dfX[list(dfX.columns[:10])], data=dfX)
+plt.xticks(np.arange(1, 11), dfX.columns[:10], rotation=-45)
+
+plt.subplot(312)
+plt.boxplot(dfX[list(dfX.columns[10:20])], data=dfX)
+plt.xticks(np.arange(1, 11), dfX.columns[10:20], rotation=-45)
+
+plt.subplot(313)
+plt.boxplot(dfX[list(dfX.columns[20:30])], data=dfX)
+plt.xticks(np.arange(1, 11), dfX.columns[20:30], rotation=-45)
+
+plt.tight_layout()
+plt.show() ;
+```
+![dt22.png](./images/dt/dt22.png)
+
+#### 최대최소값이 큰 mean area, area error, worst area 변수 제외하고 box plot 
+- area 변수를 제거한 후 나머지 변수중에서도 분포가 다른 변수가 있다.
+    - perimeter 컬럼
+- **즉 전체적으로 독립변수의 스케일이 다 다르다는 것을 알 수 있다.**
+
+```python
+cols2 = [col for col in df.columns if "area" not in col]
+cols2 = cols2[:-1]  ## class 제거
+
+plt.figure(figsize=(10, 15))
+plt.subplot(311)
+plt.boxplot(dfX[cols2[:9]], data=dfX)
+plt.xticks(np.arange(1, 10), dfX[cols2[:9]], rotation=-45)
+
+plt.subplot(312)
+plt.boxplot(dfX[cols2[9:18]], data=dfX)
+plt.xticks(np.arange(1, 10), dfX[cols2[9:18]], rotation=-45)
+
+plt.subplot(313)
+plt.boxplot(dfX[cols2[18:]], data=dfX)
+plt.xticks(np.arange(1, 10), dfX[cols2[18:]], rotation=-45)
+
+plt.tight_layout()
+plt.show() ;
+```
+![dt23.png](./images/dt/dt23.png)
 
 
+#### area 컬럼들만 box plot 확인
+
+```python
+fig = go.Figure()
+fig.add_trace(go.Box(y=dfX["mean area"], name="mean area"))
+fig.add_trace(go.Box(y=dfX["area error"], name="area error"))
+fig.add_trace(go.Box(y=dfX["worst area"], name="worst area"))
+fig.show() ;
+```
+![dt24.png](./images/dt/dt24.png)
+
+#### perimeter 컬럼들만 box plot 확인
+
+```python
+fig = go.Figure()
+fig.add_trace(go.Box(y=dfX["mean perimeter"], name="mean perimeter"))
+fig.add_trace(go.Box(y=dfX["perimeter error"], name="perimeter error"))
+fig.add_trace(go.Box(y=dfX["worst perimeter"], name="worst perimeter"))
+fig.show() ;
+```
+![dt25.png](./images/dt/dt25.png)
+
+### 2-4. DT 모델링
+- 원본 데이터
+- 분류 결과가 나쁘지는 않다.
+    - train : 0.97
+    - test : 0.93
+
+```python
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import accuracy_score
+
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2,
+                                                   stratify=y, random_state=13)
+bc_tree = DecisionTreeClassifier(max_depth=3, min_samples_leaf=1, random_state=0)
+bc_tree.fit(X_train, y_train)
+
+## 학습, 검증 데이터 성능 측정
+y_pred_tr = bc_tree.predict(X_train)
+y_pred_test = bc_tree.predict(X_test)
+
+print("acc train : {}".format(accuracy_score(y_train, y_pred_tr)))
+print("acc test : {}".format(accuracy_score(y_test, y_pred_test)))
+
+>>> print
+
+acc train : 0.9714285714285714
+acc test : 0.9298245614035088
+```
+
+#### 분류 결과표, 분류 분석표 확인
+- 암환자를 비암환자로 잘 못 예측한 것 6개
+- 비암환자를 암환자로 잘 못 예측한 것 2개
+
+```python
+from sklearn.metrics import (confusion_matrix, classification_report)
+
+print(confusion_matrix(y_test, y_pred_test))
+
+>>> print
+
+[[36  6]
+ [ 2 70]]
+
+print(classification_report(y_test, y_pred_test))
+
+>>> print
+
+              precision    recall  f1-score   support
+
+           0       0.95      0.86      0.90        42
+           1       0.92      0.97      0.95        72
+
+    accuracy                           0.93       114
+   macro avg       0.93      0.91      0.92       114
+weighted avg       0.93      0.93      0.93       114
+
+```
+
+### 2-5. pipeline 모델링
+- max_depth와 min_samples_leaf 값을 높이니 성능이 개선 된다.
+    - 그러나 의사결정나무의 greedy 한 예측 성능도 감안해야 한다.
+
+```python
+from sklearn.pipeline import Pipeline
+
+estimators = [("clf", DecisionTreeClassifier())]
+pipe = Pipeline(estimators)
+pipe.set_params(clf__max_depth=4)
+pipe.set_params(clf__min_samples_leaf=2)
+pipe.fit(X_train, y_train)
+
+y_pred_tr = pipe.predict(X_train)
+y_pred_test = pipe.predict(X_test)
+
+print("acc train : {}".format(accuracy_score(y_train, y_pred_tr)))
+print("acc test : {}".format(accuracy_score(y_test, y_pred_test)))
+
+>>> print
+
+acc train : 0.9824175824175824
+acc test : 0.9473684210526315
+```
+
+### 2-6. 노드 분할 시 사용된 독립변수 별 중요도
+- DT 모델 객체의 속성값 사용
+    - feature importances에 저장되어 있다.
+- worst arear 변수의 중요도가 가장 높다.
+    - **즉 의사결정나무가 노드를 분할하는데 있어서 이 변수의 기준값이 가장 크게 영향을 미쳤다는 의미**
+
+```python
+feature_importance = pd.DataFrame({"feature": list(dfX.columns), 
+                                   "pipe" : pipe["clf"].feature_importances_}, 
+				   columns=["feature", "pipe"]).sort_values("pipe", ascending=False)
+feature_importance
+```
+![dt26.png](./images/dt/dt26.png)
 
 
+### 2-7. DT 모델의 여러가지 매서드
+
+#### 모델에 사용된 클래스의 갯수
+
+```python
+pipe["clf"].classes_
+
+>>> print
+
+array([0, 1])
+```
+
+#### 모델에 사용된 독립변수의 갯수
+
+```python
+pipe["clf"].max_features_
+
+>>> print
+
+30
+```
+
+#### 모델의 객체 정보
+
+```python
+pipe["clf"].tree_
+
+>>> print
+
+<sklearn.tree._tree.Tree at 0x260ca774340>
+```
+
+#### 모델의 노드 분할 경로
+- 노드가 분할 된 경로 값
+    - 정확한 의미 알아 볼 것
+
+```python
+pipe["clf"].decision_path(dfX)
+
+>>> print
+
+<569x19 sparse matrix of type '<class 'numpy.int64'>'
+	with 2482 stored elements in Compressed Sparse Row format>
+```
+
+#### 모델의 depth 파라미터의 값
+
+```python
+pipe["clf"].get_depth()
+
+>>> print
+
+4
+```
+
+#### 모델의 leaf의 갯수
+- 분할된 노드의 갯수
+
+```python
+pipe["clf"].get_n_leaves()
+
+>>> print
+
+10
+```
+
+#### 모델의 파라미터 값 반환
+
+```python
+pipe["clf"].get_params()
+
+>>> print
+
+{'ccp_alpha': 0.0,
+ 'class_weight': None,
+ 'criterion': 'gini',
+ 'max_depth': 4,
+ 'max_features': None,
+ 'max_leaf_nodes': None,
+ 'min_impurity_decrease': 0.0,
+ 'min_samples_leaf': 2,
+ 'min_samples_split': 2,
+ 'min_weight_fraction_leaf': 0.0,
+ 'random_state': None,
+ 'splitter': 'best'}
+```
+
+#### 모델에 내장 된 성능 측정기
+- 평균 정확도값
+
+```python
+pipe["clf"].score(X, y)
+
+>>> print
+
+0.9753954305799648
+```
+### 2-8. 스케일링 적용한 데이터로 모델링
+
+#### MinMaxScaler
+- 최대값 1, 최소값을 0으로 맞춰준다.
+
+```python
+from sklearn.preprocessing import MinMaxScaler
+
+estimators = [("scaler", MinMaxScaler()), ("clf", DecisionTreeClassifier())]
+pipe = Pipeline(estimators)
+
+## 스케일링 적용
+X_mms = pipe["scaler"].fit_transform(dfX)
+X_train, X_test, y_train, y_test = train_test_split(X_mms, y, test_size=0.2, stratify=y, random_state=13)
+
+## 학습, 검증 성능 측정
+pipe.fit(X_train, y_train)
+y_pred_tr = pipe.predict(X_train)
+y_pred_test = pipe.predict(X_test)
+
+print("acc train : {}".format(accuracy_score(y_train, y_pred_tr)))
+print("acc test : {}".format(accuracy_score(y_test, y_pred_test)))
+
+>>> print
+
+acc train : 1.0
+acc test : 0.9385964912280702
+```
+
+#### StandardScaler
+- 평균을 0, 표준편차를 1로 맞춰준다.
+- **성능이 크게 달라지지 않는다.**
+
+```python
+from sklearn.preprocessing import StandardScaler
+
+estimators2 = [("scaler", StandardScaler()), ("clf", DecisionTreeClassifier())]
+pipe2 = Pipeline(estimators2)
+## 파라미터 값 변경
+pipe2.set_params(clf__max_depth=4)
+pipe2.set_params(clf__min_samples_leaf=2)
+
+## 스케일링 적용
+X_ss = pipe2["scaler"].fit_transform(dfX)
+X_train, X_test, y_train, y_test = train_test_split(X_ss, y, test_size=0.2, stratify=y, random_state=13)
+
+## 학습, 검증 성능 측정
+pipe2.fit(X_train, y_train)
+y_pred_tr = pipe2.predict(X_train)
+y_pred_test = pipe2.predict(X_test)
+
+print("acc train : {}".format(accuracy_score(y_train, y_pred_tr)))
+print("acc test : {}".format(accuracy_score(y_test, y_pred_test)))
+
+>>> print
+
+acc train : 0.9824175824175824
+acc test : 0.9473684210526315
+```
+
+### 2-9. GridSearchCV 사용한 하이퍼파라미터 튜닝
+- 스케일링을 적용한 모델 
+
+```python
+from sklearn.model_selection import GridSearchCV
+
+## 파이프라인 생성
+estimators = [
+    ("scaler", StandardScaler()),
+    ("clf", DecisionTreeClassifier())
+]
+pipe = Pipeline(estimators)
+
+## 그리드서치에서 사용할 파라미터의 범위
+param_grid = [{"clf__max_depth" : [i for i in range(16)]},
+              {"clf__min_samples_leaf" : [i for i in range(16)]}]
+
+## 그리드서치 객체 생성, 훈련
+gridcv = GridSearchCV(estimator=pipe, param_grid=param_grid, cv=5)
+gridcv.fit(X, y)
+
+>>> print
+
+GridSearchCV(cv=5,
+             estimator=Pipeline(steps=[('scaler', StandardScaler()),
+                                       ('clf', DecisionTreeClassifier())]),
+             param_grid=[{'clf__max_depth': [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10,
+                                             11, 12, 13, 14, 15]},
+                         {'clf__min_samples_leaf': [0, 1, 2, 3, 4, 5, 6, 7, 8,
+                                                    9, 10, 11, 12, 13, 14,
+                                                    15]}])
+```
+
+### 2-10. 의사결정나무 시각화
+- graphviz의 그래프를 이미지로 저장하는 방법
+
+```python
+import graphviz
+from sklearn.tree import export_graphviz
+
+## dot 데이터로 반환된다.
+dot_data = export_graphviz(gridcv.best_estimator_["clf"],
+                           feature_names=dfX.columns,
+                           class_names=bc.target_names,
+                           rounded=True, filled=True)
+
+## dot 데이터를 시각
+graph = graphviz.Source(dot_data)
+
+## 이미지로 저장
+graph.render(filename="gridcv_dt", directory="./", format="png")
+```
+![gridcv_dt.png](./images/dt/gridcv_dt.png)
+
+### 2-11. 그리드서치 모델의 속성값, 매서드값 확인
+
+#### 가장 좋은 모델
+
+```python
+gridcv.best_estimator_
+
+>>> print
+
+Pipeline(steps=[('scaler', StandardScaler()),
+                ('clf', DecisionTreeClassifier(min_samples_leaf=10))])
+```
+
+#### 가장 높은 성능
+
+```python
+gridcv.best_score_
+
+>>> print
+
+0.9402577239559073
+```
+
+#### 그리드서치 모델링 결과
+
+```python
+import pprint
+
+pp = pprint.PrettyPrinter(indent=4)
+pp.pprint(gridcv.cv_results_)
+```
+![dt27.png](./images/dt/dt27.png)
+
+#### 모델링 결과를 데이터 프레임으로 변환
+
+```python
+gridcv_df = pd.DataFrame(gridcv.cv_results_)
+gridcv_df
+```
+![dt28.png](./images/dt/dt28.png)
 
 
+#### 검증 성능이 높은 모델의 파라미터 
 
+```python
+gridcv_df[["params", "mean_test_score", "rank_test_score"]].sort_values("rank_test_score", ascending=True)
+```
+![dt29.png](./images/dt/dt29.png)
 
+#### 가장 성능이 높은 모델의 파라미터
 
+```python
+gridcv.best_estimator_["clf"].get_params()
 
+>>> print
 
+{'ccp_alpha': 0.0,
+ 'class_weight': None,
+ 'criterion': 'gini',
+ 'max_depth': None,
+ 'max_features': None,
+ 'max_leaf_nodes': None,
+ 'min_impurity_decrease': 0.0,
+ 'min_samples_leaf': 10,
+ 'min_samples_split': 2,
+ 'min_weight_fraction_leaf': 0.0,
+ 'random_state': None,
+ 'splitter': 'best'}
+```
 
+### 2-12. 파이프라인 모델과 그리드 서치 모델의 변수 중요도 비교
 
+```python
+feature_importance2 = pd.DataFrame({"feature" : dfX.columns, "gridcv" : gridcv.best_estimator_["clf"].feature_importances_})
+merge_fi = pd.merge(feature_importance, feature_importance2, left_on="feature", right_on="feature", how="outer")
+merge_fi
+```
+![dt30.png](./images/dt/dt30.png)
 
