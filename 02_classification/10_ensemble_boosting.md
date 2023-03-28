@@ -12,7 +12,7 @@
 - `위원회 commitee` : 모형의 집합, C
     - m개의 개별모형을 포함하는 위원회, 모형 집합 : $C_m$
     - 개별 모형 : 약 분류기 (weak classifier) : k
-    - $C_1 =  \left{ k_{1} \right} $ 
+    - $C_1 =  \left\{ k_{1} \right} $ 
     - $C_m=C_{m-1} \cup k_m = \left\{ k_1, k_2, \cdots, k_m \right\}$
     - 이전 위원회에 개별모형 k_m이 추가 된다.
 - `k_m의 선택 방법`
@@ -41,12 +41,13 @@
         - 후보 모형별로 예측을 틀리게 한 비중이 다르다.
     - $\alpha_m = \dfrac{1}{2} \text{log} \left( \dfrac{1-\epsilon_m}{\epsilon_m} \right)$
         - alpha는 모형에 대한 가중치, w는 데이터에 대한 가중치
+
 ### 1-1. 데이터 샘플에 대한 가중치 w
 - 데이터에 대한 가중치 w_i는 최초에는 모든 데이터에 같은 균일한 값이지만, 위원회가 증가할때마다 값이 변한다.        
     - $w_{m, i} = w_{m-1, i} exp(-y_i C_{m-1}) = 
     \left\{\begin{matrix}
-\;w_{m-1,i} e^{-1} \;\; if \; C_{m-1} = y_i (\text{예측이 맞은 경우}) \\
-\;w_{m-1,i} e \;\;\; if \; C_{m-1} \neq y_i (\text{예측이 틀린 경우})
+\;w_{m-1,i} e^{-1} \;\; if \; C_{m-1} = y_{i} (\text{예측이 맞은 경우}) \\
+\;w_{m-1,i} e \;\;\; if \; C_{m-1} \neq y_{i} (\text{예측이 틀린 경우})
 \end{matrix}\right.$
     - 예측이 맞은 경우 가중치 값은 작아지고, 예측이 틀린 경우 가중치 값은 크게 확대(boosting) 된다.
     - m번째 개별 모형의 모든 후보에 대해 이 손실함수 L을 적용하여 값이 가장 작은 후보 를 선택한다.
