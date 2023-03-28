@@ -44,11 +44,7 @@
 
 ### 1-1. 데이터 샘플에 대한 가중치 w
 - 데이터에 대한 가중치 w_i는 최초에는 모든 데이터에 같은 균일한 값이지만, 위원회가 증가할때마다 값이 변한다.        
-    - $w_{m, i} = w_{m-1, i} exp(-y_i C_{m-1}) = 
-    \left{\begin{matrix}
-\;w_{m-1,i} e^{-1} \;\; if \; C_{m-1} = y_{i} \\
-\;w_{m-1,i} e \;\;\; if \; C_{m-1} \neq y_{i}
-\end{matrix}right.$
+    - <img src="https://latex.codecogs.com/gif.latex?w_%7Bm%2C%20i%7D%20%3D%20w_%7Bm-1%2C%20i%7D%20exp%28-y_i%20C_%7Bm-1%7D%29%20%3D%20%5Cleft%5C%7B%5Cbegin%7Bmatrix%7D%20%5C%3Bw_%7Bm-1%2Ci%7D%20e%5E%7B-1%7D%20%5C%3B%5C%3B%20if%20%5C%3B%20C_%7Bm-1%7D%20%3D%20y_i%20%5C%5C%20%5C%3Bw_%7Bm-1%2Ci%7D%20e%20%5C%3B%5C%3B%5C%3B%20if%20%5C%3B%20C_%7Bm-1%7D%20%5Cneq%20y_i%20%5Cend%7Bmatrix%7D%5Cright.">
     - 예측이 맞은 경우 가중치 값은 작아지고, 예측이 틀린 경우 가중치 값은 크게 확대(boosting) 된다.
     - m번째 개별 모형의 모든 후보에 대해 이 손실함수 L을 적용하여 값이 가장 작은 후보 를 선택한다.
 
