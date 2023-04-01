@@ -134,16 +134,145 @@
 ### 4-2. python
 - from sklearn.ensemble import GradientBoostingClassifier
     
-## 5. XGBoost, LightGBM 라이브러리
+## 5. XGBoost,  라이브러리
+- `XGBoost (Extream Gradient Boosting)` : 그래디언트 부스팅 머신을 보완한 분류 모형
+- `그래디언트 부스팅` : Friedman의 논문 "Greedy Function Approximation" 에서 "A Gradient Boosting Machine(GBM)"에서 유래됨
+    - 위원회 방식 : 매 실행마다 손실함수를 최소화하는 m번째 약분류기를 추가하는 방식.이 과정에서 데이터샘플의 가중치와 약분류기의 가중치를 이전 위원회로부터 이어받는데 틀린 예측의 가중치를 확대하고, 맞은 예측의 가중치를 작게하는 방식으로 현재 모델의 가중치를 찾는다.  
+    - 범함수 형태의 손실함수(L(y, C_m))를 최소하화하는 k_m을 찾기 위해 변분법을 사용하는 방식
+    - 회귀와 분류문제 모두 회귀모형을 사용하며, "의사결정 회귀나무"를 주로 사용한다.
+- `xgb 장점`
+    - GBM에서 pc의 파워를 효율적으로 사용하기 위한 다양한 기법에 채택되어 빠른 속도와 효율을 가진다.
 
-### 5-1. XGBoost
-- XGBoost (eXtra Gradient Boost) : GBM에서 pc의 파워를 효율적으로 사용하기 위한 다양한 기법에 채택되어 빠른 속도와 효율을 가진다.
+### 5-1. 이론적 배경
+- `지도학습의 수학적 모형에 기반한다.`
+    - $\hat{y} = \sum_{j} \theta_j, x_{ij}$  
+- 회귀, 분류, 순위 지정과 같은 문제에 적용할 수 있다.
+    - XGBLogisticRegressor
+    - XGBClassifier
+    - XGBRanking
+- 목적함수의 구성 : 학습 데이터의 손실함수 + 정규화 항
+    - $\text{obj}(\theta) = L(\theta) + \Omega(\theta)$
+- 손실함수 L: 훈련 데이터에 대한 모형의 예측 정확도를 평균제곱오차(mse)로 측정함
+    - $L(\theta) = \sum_{i} = (y_i - \hat{y}_2)^2$
+    - 로지스틱 손실함수가 사용되기도 함
+- 정규화 항 : 모델의 복잡성을 제어하여 과적합을 방지하는 역할
+    - 학습 데이터에 대해 모형의 정규화 항의 갯수와 손실함수의 크기가 적당해야 한다.
+    - 적당한 모형을 찾기 위해 편향-분산 트레이드 오프를 사용한다.
+- `의사 결정 나무에 기반한 선택 과정을 따른다.`
+    - 트리 앙상블 모델의 특징 : 회귀와 분류 문제에 사용할 수 있다. (CART)
+    - DT는 노드에 결정값만 포함되지만 CART 모델은 결정값(점수)이 각 리프와 연결되어 있는 특징이 있다. 더 풍부한 해석이 가능하다.
+    - 앙상블 트리는 개별 트리들의 결과값을 합산해주므로 DT 보다 더 유의미하다.
+- `랜덤포레스트`
+    - DT를 개별모형으로 모형결합하는 방식
+    - 각 노드에서 모든 독립변수를 비교하는 것이 아니라, 랜덤하게 독립변수의 특징차원을 감소시키다.
+    - 이 독립변수들을 비교한 후 노드를 분리할 최적의 변수를 선택한다. 개별 모형(DT)사이의 상관관계가 줄어들어 모형 성능의 변동이 감소한다. 즉 모형의 성능이 안정화 된다.
+    - Extream Randomized Trees 모형은 노드 분리시 랜덤하게 독립변수의 차원을 줄이는 것이 아니라 아예 랜덤하게 독립변수를 선택한다.
+- `앙상블 나무 모형`
+    - 개별나무 전체를 평가하는 것이 아니라 각 단계마다 새로운 개별나무를 추가해나가는 방식
+    - $\hat{y}_i^{t} = \sum_{k=1}^{t} f_k(x_i) = \hat{y}_i^{t-1} + f_t(x_i)$
+    - 목적함수 : $\begin{aligned}
+\text{obj}^{(t)} 
+&= \sum_{i=1}^{n} l(y_i, \hat{y}_i^{(t)}) + \sum_{i=1}^{t} \omega (f_i) \\
+&= \sum_{i=1}^{n} l(y_i, \hat{y}_i^{(t-1)} + f_t (x_i)) + \omega (f_i) + constant 
+\end{aligned}$
+    - 목저감수의 손실함수를 MSE를 사용하면 수식정리가 간단하지만, 로지스틱 손실함수를 사용하면 테일러 확장을 적용해야하므로 정리가 쉽지 않다.
+- `XGBoost 모형의 목적함수` : 로그손실 값을 손실함수로 사용
+    - $\sum_{i=1}^{n} [g_i f_t(x_i) + \dfrac{1}{2} h_i f_t^{2} (x_i)] + \omega (f_t)$
+    - 이 목적함수를 최소화하는 새로운 개별 모형을 선택한다.
+    - **XGBoost 모형은 로지스틱 회귀모형과 쌍별랭킹을 포함한 손실함수를 최적화할 수 있다.**
+- 정규화 가중치 정의 : 복잡도에 대한 가중치
+    - $\omega (f) = \gamma T + \dfrac{1}{2} \lambda \sum_{j=1}^{T} w_j^{2}$
+    - $\omega$ : 노드(잎)에 대한 점수 벡터 : 가중치
+    - T : 노드(잎)의 갯수
+    - 일반적으로 나무 모형은 불순도(엔트로피) 개선에 중점을 두고 복잡성 제어는 휴리스틱 방법(사용자의 방법)에 맡긴다.
+    - **XGBoost 모델은 이 복잡성 제어를 공식적으로 사용하여 더 나은 모델을 얻을 수 있는 방법이다.**
+- 목적함수에 정규화 가중치 식을 추가하여 정리하면 정보획득량을 구할 수 있다.
+    - gain = 1/2 [왼쪽 노드 점수 + 오른쪽 노드 점수 - 원래 노드 점수] + 정규화가중치
+
+### 5-2. 파라미터 튜닝
+- `편향-분산 법칙`
+   - XGBoost의 파라미터는 편향-분산 트레이드 오프와 관련되어 있다.
+   - 모델이 복잡해질 수록(max depth가 더 깊어질 수록) 훈련 데이터에 적합한 모형이 되어 편향이 줄어 든다.
+   - 그러나 복잡해진 모델을 맞추기 위해서는 데이터가 더 필요하게 된다.
+- `과적합 통제 방법`
+   - 훈련 데이터에 대한 성능은 높지만 검증 데이터에 대한 성능이 낮을 경우 2가지 방법 사용할 수 있다.
+   - 모델 복잡성을 직접 제어하는 방법
+       - max_depth, min_child_weight, gamma
+   - 훈련데이터에 임의성을 추가하여 노이즈에 강화시키는 방법 
+       - subsample, colsample_bytree
+       - eta(스텝사이즈), num_round
+- `훈련 속도 증가`
+    - tree_method, hist, gpu_hist
+- `불균형 데이터 처리`
+    - 광고 로그 데이터와 같이 데이터가 불균형인 경우
+    - AUC 값과 관련하여 양수가중치와 음수가중치 설정
+        - scale_pos_weight
+    - 정확한 예측 확률과 관련하여
+        - max_delta_step
+
+### 5-3. 여러가지 XGBoost 모형
+- 각 클래스마다 파라미터와 속성값이 거의 같다.
+- 패키지 임포트
     - import xgboost
+- 분류 모형 클래스
     - xgb = xgboost.XGBClassifier()
+- Booster 모형 클래스
+    - xgb_booster = xgboost.Booster()
+- 교차검증 클래스
+    - xgb_cv = xgboost.cv()
+- XGBoost 용 scikit learn의 래퍼 함수 클래스
+    - xgboost.XGBRegressor()
+- XGBoost 랜덤 포레스트 회귀 나무 
+    - xgboost.XGBRFRegressor()
+- XGBoost 랜덤 포레스트 분류 모형
+    - xgboost.XGBRFClssifier()
+    
+### 5-4. 파라미터
+- n_estimators : 약 분류기의 갯수
+- max_depth : 나무의 깊이
+- max_leaves : 노드의 최대갯수
+- grow_policy : 나무의 크기 정책 
+    - 0 : 노드에서 가까운 노드로 분할
+    - 1 : 손실의 변화가 가장 큰 노드에서 분할함
+- learning_rate : 학습률
+- booster : 부스터 방법 : gbtree, gblinear, dart 
+- n_jobs : 병렬 스레드 수, 그리드 서치를 사용할 때 스레드를 병렬화하는 방식
+- min_child_weight : 하위 노드에 필요한 가중치의 최소합
+- early_stopping_rounds : 훈련을 조기에 중지하도록 설정
 
-### 5-2. LightGBM
+### 5-5. 속성값
+- best_iteration : 훈련을 조기중지한 반복값
+- best_score : 훈련을 조기중지한 최고의 성능값
+- coeff_ : 계수값
+- feature_importances_ : 독립변수 중요도
+
+## 6. LightGBM 라이브러리
 - LightGBM (Light Gradient Bosst Machine) : XGBoost 보다 빠른 속도를 갖는다.
-    - import lightgbm
-    - lgbm = lightgbm.LGBMClassifier()
+
+### python
+- import lightgbm
+- lgbm = lightgbm.LGBMClassifier()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
