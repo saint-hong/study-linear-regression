@@ -31,8 +31,8 @@
 - `위원회 commitee` : 모형의 집합, C
     - m개의 개별모형을 포함하는 위원회, 모형 집합 : $C_m$
     - 개별 모형 : 약 분류기 (weak classifier) : k
-    - $C_1 =  \left\{ k_{1} \right} $ 
-    - $C_m=C_{m-1} \cup k_m = \left\{ k_1, k_2, \cdots, k_m \right\}$
+    - $C_1 =  { k_{1} } $ 
+    - $C_m=C_{m-1} \cup k_m = { k_1, k_2, \cdots, k_m }$
     - 이전 위원회에 개별모형 k_m이 추가 된다.
 - `k_m의 선택 방법`
     - $C_{m-1}$의 성능을 보완하는 것을 선택한다.
