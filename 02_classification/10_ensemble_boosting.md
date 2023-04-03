@@ -899,9 +899,12 @@ Grad 0.7884615384615384
 LogR 0.7469230769230769
 ```
 
-## 그리드 서치 : boosting 모형 실험
+# aggregation, boosting 모형 실험
+- DecisionTree, RandomForest, ExtraTrees, AdaBoosting, GradientBoost, XGBoost, LGBM
 
-### 1. DT 모형 실험 1
+## 1. DecisionTree 실험
+
+### 1-1. DT 실험 1
 - max_depth, random_state, min_samples_leaf 파라미터를 변화하여 실험
 - min_samples_leaf에 따라서 성능 그룹이 생김
 - 튜닝을 하기전보다 오히려 더 낮아짐
@@ -923,8 +926,7 @@ grid_dt.fit(X_ss, y)
 Wall time: 7min 8s
 ```
 
-
-### 1-1. 모형의 분류 결과
+#### 모형 실험 결과
 - min_samples_leaf 파라미터를 기준으로 성능값이 같다.
 
 ```python
@@ -938,7 +940,7 @@ cv_result_dt
 ```
 ![bo_15.png](./images/en_bo/bo_15.png)
 
-### 1-2. rank 1의 min samples leaf
+#### rank 1의 min samples leaf
 
 ```python
 cv_result_dt[cv_result_dt["rank_test_score"] == 1]["params"].apply(lambda x : x["min_samples_leaf"]).value_counts()
@@ -948,7 +950,7 @@ cv_result_dt[cv_result_dt["rank_test_score"] == 1]["params"].apply(lambda x : x[
 98    260
 Name: params, dtype: int64
 ```
-### 1-3. 성능이 좋은 모형
+#### 성능이 좋은 모형
 
 ```python
 grid_dt.best_estimator_
@@ -958,7 +960,7 @@ grid_dt.best_estimator_
 DecisionTreeClassifier(max_depth=16, min_samples_leaf=98, random_state=0)
 ```
 
-### 1-4. 가장 좋은 성능
+#### 가장 좋은 성능
 - 파라미터 튜닝은 파라미터의 조합에 따라서 성능이 크게 달라진다.
     - 파라미터 튜닝을 하지 않은 기본 모형을 사용한 경우가 성능이 더 좋을 수 있다.
 
@@ -970,7 +972,7 @@ grid_dt.best_score_
 0.747421330017173
 ```
 
-### 1-5. 검증 데이터에 대한 성능
+#### 검증 데이터에 대한 성능
 
 ```python
 accuracy_score(y_test, grid_dt.best_estimator_.predict(X_test))
@@ -980,7 +982,7 @@ accuracy_score(y_test, grid_dt.best_estimator_.predict(X_test))
 0.7730769230769231
 ```
 
-### 2. 그리드 서치 : DT 실험 2
+### 1-2. DT 실험 2
 - 파라미터 튜닝 : max_depth, random_state의 조합에 따라서 성능 측정
     - min_samples_leaf 제외
 
@@ -998,7 +1000,7 @@ grid_dt_2.fit(X_ss, y)
 Wall time: 40.1 s
 ```
 
-### 2-1. 모형의 실험 결과
+#### 모형의 실험 결과
 - 성능이 가장 좋은 모형들
     - random_state 파라미터를 기준으로 성능이 그룹화 됨
 
@@ -1014,7 +1016,7 @@ cv_result_dt_2[cv_result_dt_2["rank_test_score"]==1]
 ![bo_16.png](./images/en_bo/bo_16.png)
 
 
-### 2-2. 가장 성능이 좋은 모형
+#### 가장 성능이 좋은 모형
 
 ```python
 grid_dt_2.best_estimator_
@@ -1024,7 +1026,7 @@ grid_dt_2.best_estimator_
 DecisionTreeClassifier(max_depth=31, random_state=1)
 ```
 
-### 2-3. 가장 높은 성능
+#### 가장 높은 성능
 - min_samples_leaf 파라미터 튜닝을 사용했을 때보다 성능이 높다.
 
 ```python
@@ -1035,7 +1037,7 @@ grid_dt_2.best_score_
 0.7889809912950791
 ```
 
-### 2-4. 성능값이 같은 모형의 파라미터
+#### 성능값이 같은 모형의 파라미터
 - **random_state 가 1이면서 max_depth 값이 작은 모형이 best 모형이라고 볼 수 있다.**
     - max_depth 값이 클 수록 모형의 과적합이 커진다.
     - 성능의 분산이 커진다.
@@ -1060,7 +1062,7 @@ cv_result_dt_2[cv_result_dt_2["rank_test_score"]==1]["params"]
 Name: params, dtype: object
 ```
 
-### 3. DT 실험 3
+### 1-3. DT 실험 3
 - 파라미터 튜닝 : max_depth 만 사용
 
 ```python
@@ -1076,7 +1078,7 @@ grid_dt_3.fit(X_ss, y)
 Wall time: 2.09 s
 ```
 
-### 3-1. 모형 실험 결과
+#### 모형 실험 결과
 - max_depth=151 인 모형의 성능이 가장 좋지만, 과적합이 심하다.
     - 분산 점수가 작다.
 - max_depth=1 인 모형의 성능이 가장 낮지만, 과적합이 거의 없다.
@@ -1093,7 +1095,7 @@ cv_result_dt_3
 ```
 ![bo_17.png](./images/en_bo/bo_17.png)
 
-## DT 실험 결과
+### 1-4. DT 실험 결과
 - 파라미터 튜닝에서 파라미터의 조합에 따라서 성능이 크게 달라진다.
 - 나무의 크기가 커질 수록 성능은 높지만 과적합이 심해진다.
 - 따라서 나무의 크기와 연관된 파라미터 max_depth, min_samples_leaf의 값을 크게 늘일 필요가 없다.
@@ -1104,7 +1106,9 @@ cv_result_dt_3
     - **그러므로 여러 분류 모형을 실험하여 현재 데이터에 안정적이면서 성능이 높은 모형을 찾는 것이 좋다고 볼 수 있다.**
 
 
-### 4. RF 실험 1
+## 2. RandomForest 실험
+
+### 2-1. RF 실험 1
 - 파라미터 튜닝 : n_estimators
 
 ```python
@@ -1121,7 +1125,7 @@ grid_rf.fit(X_ss, y)
 Wall time: 19.8 s
 ```
 
-### 4-1. 모형 실험 결과
+#### 모형 실험 결과
 - 10부터 100까지 10개 단위로 개별 모형의 갯수를 증가시킨 결과 DT 모델보다 성능이 좋다.
     - 과적합이 있지만 미세하게 작다.
 
@@ -1136,7 +1140,7 @@ cv_result_rf
 ![bo_18.png](./images/en_bo/bo_18.png)
 
 
-### 4-2. 가장 성능이 좋은 모형
+#### 가장 성능이 좋은 모형
 
 ```python
 grid_rf.best_estimator_
@@ -1146,7 +1150,7 @@ grid_rf.best_estimator_
 RandomForestClassifier(n_estimators=90)
 ```
 
-### 4-3. 가장 높은 성능
+#### 가장 높은 성능
 
 ```python
 grid_rf.best_score_
@@ -1156,7 +1160,7 @@ grid_rf.best_score_
 0.8370008882572394
 ```
 
-### 5. RF 실험 2
+### 2-2. RF 실험 2
 - 파라미터 튜닝 : n_estimators의 범위를 100~1000 까지 확대
 
 ```python
@@ -1173,7 +1177,7 @@ grid_rf_2.fit(X_ss, y)
 Wall time: 19min 38s
 ```
 
-### 5-1. 모형 실험 결과
+#### 모형 실험 결과
 - n_estimators가 100 이상인 경우 모든 모형이 과적합이 발생한다.
     - 100 이하인 모델의 성능과 크게 차이 나지 않는다.
 
@@ -1188,7 +1192,7 @@ cv_result_rf_2
 ![bo_19.png](./images/en_bo/bo_19.png)
 
 
-### 5-2. 가장 성능이 좋은 모형
+#### 가장 성능이 좋은 모형
 
 ```python
 grid_rf_2.best_estimator_
@@ -1198,7 +1202,7 @@ grid_rf_2.best_estimator_
 RandomForestClassifier(n_estimators=370)
 ```
 
-### 5-3. 가장 높은 성능
+#### 가장 높은 성능
 
 ```python
 grid_rf_2.best_score_
@@ -1208,10 +1212,10 @@ grid_rf_2.best_score_
 0.8394624267187776
 ```
 
-### 6. RF 실험 3
+### 2-3. RF 실험 3
 - 파라미터 튜닝 : n_estimators, max_leaf_nodes(노드 분할 최대 갯수)
 
-### 6-1. 개별 모형의 갯수 범위
+#### 개별 모형의 갯수 범위
 - RF 실험 2에서 성능이 높은 모형의 파라미터도 추가함
 
 ```python
@@ -1224,7 +1228,7 @@ array([100, 220, 340, 460, 580, 700, 820, 940, 370, 475, 175, 625, 460],
       dtype=object)
 ```
 
-### 6-2. 모형 실험
+#### 모형 실험
 
 ```python
 %%time
@@ -1241,7 +1245,7 @@ grid_rf_3.fit(X_ss, y)
 Wall time: 4min 10s
 ```
 
-### 6-3. 모형 실험 결과
+#### 모형 실험 결과
 - **max_leaf_nodes 파라미터가 개별 모형의 갯수 증가에 따른 과적합을 방지해준다.**
     - RF 실험 2에서 개별 모형의 갯수가 크게 늘어나면서 모든 모형에서 과적합이 발생했지만, max_leaf_nodes 파라미터를 적용한 후 과적합이 거의 사라졌다.
     - 성능은 다소 낮지만 모형은 안정적이라고 볼 수 있다.    
@@ -1257,7 +1261,7 @@ cv_result_rf_3
 ```
 ![bo_20.png](./images/en_bo/bo_20.png)
 
-### 6-4. 가장 성능이 좋은 모형
+#### 가장 성능이 좋은 모형
 
 ```python
 grid_rf_3.best_estimator_
@@ -1267,7 +1271,7 @@ grid_rf_3.best_estimator_
 RandomForestClassifier(max_leaf_nodes=4, n_estimators=625)
 ```
 
-### 6-5. 가장 높은 성능
+#### 가장 높은 성능
 
 ```python
 grid_rf_3.best_score_
@@ -1277,7 +1281,7 @@ grid_rf_3.best_score_
 0.7304874755729258
 ```
 
-### 7. RF 실험 4
+### 2-4. RF 실험 4
 - 파라미터 튜닝 : n_estimators, min_samples_leaf(노드의 데이터 집합의 최소 갯수)
     - max_leaf_nodes 제외
 - 시간이 매우 오래 걸린다.
@@ -1295,7 +1299,7 @@ grid_rf_4.fit(X_ss, y)
 Wall time: 27min 57s
 ```
 
-### 7-1. 모형 실험 결과
+#### 모형 실험 결과
 - estimator 갯수가 크게 증가하면서 성능이 증가하고, 과적합이 발생하지만 min_samples_leaf 가 다소 낮춰준다.
     - max_leaf_nodes 보다 과적합 방지 효과가 작다.
 
@@ -1310,7 +1314,7 @@ cv_result_rf_4
 ```
 ![bo_21.png](./images/en_bo/bo_21.png)
 
-### 7-2. 가장 성능이 좋은 모형
+#### 가장 성능이 좋은 모형
 
 ```python
 grid_rf_4.best_estimator_
@@ -1320,7 +1324,7 @@ grid_rf_4.best_estimator_
 RandomForestClassifier(min_samples_leaf=2, n_estimators=655)
 ```
 
-### 7-3. 가장 높은 성능
+#### 가장 높은 성능
 
 ```python
 grid_rf_4.best_score_
@@ -1330,7 +1334,7 @@ grid_rf_4.best_score_
 0.8359223071001363
 ```
 
-### 8. RF 실험 5
+### 2-5. RF 실험 5
 - 파라미터 튜닝 : n_estimators, max_depth
 
 ```python
@@ -1344,7 +1348,7 @@ grid_rf_5 = GridSearchCV(rf, param_grid=params_rf, cv=kfold,
 grid_rf_5.fit(X_ss, y)
 ```
 
-### 8-1. 모형 실험 결과
+#### 모형 실험 결과
 - n_estimators 값이 커질 수록 과적합이 커지지만 max_depth 값이 미미하지만 과적합을 낮춰준다.
     - RF 실험 4와 성능과 과적합이 거의 비슷하다.
 
@@ -1359,7 +1363,7 @@ cv_result_rf_5
 ```
 ![bo_22.png](./images/en_bo/bo_22.png)
 
-### 8-2. 가장 성능이 좋은 모형
+#### 가장 성능이 좋은 모형
 
 ```python
 grid_rf_5.best_estimator_
@@ -1369,7 +1373,7 @@ grid_rf_5.best_estimator_
 RandomForestClassifier(max_depth=19)
 ```
 
-### 8-3. 가장 높은 성능
+#### 가장 높은 성능
 
 ```python
 grid_rf_5.best_score_
@@ -1379,7 +1383,7 @@ grid_rf_5.best_score_
 0.838230946882217
 ```
 
-### 9. RF 실험 6
+### 2-6. RF 실험 6
 - 파라미터 튜닝 : max_depth
     - 나무의 깊이만 변경하여 실험
 
@@ -1397,7 +1401,7 @@ grid_rf_6.fit(X_ss, y)
 Wall time: 1min 25s
 ```
 
-### 9-1. 모형 실험 결과 
+#### 모형 실험 결과 
 - n_estimators 파라미터와 같이 max_depth 파라미터도 커질 수록 성능은 커지지만 과적합이 발생한다.
 
 ```python
@@ -1411,7 +1415,7 @@ cv_result_rf_6
 ```
 ![bo_23.png](./images/en_bo/bo_23.png)
 
-### 9-2. 가장 성능이 좋은 모형
+#### 가장 성능이 좋은 모형
 
 ```python
 grid_rf_6.best_estimator_
@@ -1421,7 +1425,7 @@ grid_rf_6.best_estimator_
 RandomForestClassifier(max_depth=45)
 ```
 
-### 9-3. 가장 높은 성능
+#### 가장 높은 성능
 
 ```python
 grid_rf_6.best_score_
@@ -1431,23 +1435,413 @@ grid_rf_6.best_score_
 0.8391541422395925
 ```
 
+### 2-7. RF 실험 7
+- 파라미터 튜닝 : n_estimators, max_leaf_nodes, max_depth
+    - 파라미터의 범위를 낮추고 max_leaf_nodes를 사용하여 과적합을 방지
+    - n_estimators 는 100 이하
+    - max_leaf_nodes 10 이하
+    - max_depth는 10 이하
+
+```python
+%%time
+kfold = KFold(n_splits=5, shuffle=True, random_state=2)
+
+rf = RandomForestClassifier()
+params_rf = {"max_depth" : range(10),
+            "max_leaf_nodes" : range(10),
+            "n_estimators" : [10, 50, 100]}
+grid_rf_7 = GridSearchCV(rf, param_grid=params_rf, cv=kfold,
+                       scoring="accuracy", return_train_score=True, n_jobs=2)
+grid_rf_7.fit(X_ss, y)
+
+>>> print
+
+Wall time: 1min 24s
+```
+
+#### 모형 실험 결과
+- 과적합이 발생한 모형보다 성능은 떨어지지만 과적합은 거의 없는 것으로 나타난다.
+    - 최대 성능 0.747120
+
+```python
+cv_result_rf_7 = pd.DataFrame(grid_rf_7.cv_results_)
+cv_result_rf_7 = cv_result_rf_7[["rank_test_score",
+                                 "param_max_depth",
+                                 "param_n_estimators",
+                                 "param_max_leaf_nodes",
+                                 "mean_test_score",
+                                 "std_test_score",
+                                 "mean_train_score",
+                                 "std_train_score"]]
+cv_result_rf_7 = cv_result_rf_7.sort_values("mean_test_score", ascending=False)[:20]
+cv_result_rf_7
+```
+![bo_24.png](./images/en_bo/bo_24.png)
+
+### 2-8. RF 실험 8
+- 파라미터 튜닝 : n_estimators, max_leaf_nodes, max_depth
+    - n_estimators 를 200과 500을 추가
+    - max_leaf_nodes 10 이하
+    - max_depth는 15 이하
+
+```python
+%%time
+kfold = KFold(n_splits=5, shuffle=True, random_state=2)
+
+rf = RandomForestClassifier()
+params_rf = {"max_depth" : range(15),
+            "max_leaf_nodes" : range(10),
+            "n_estimators" : [10, 20, 50, 100, 200, 500]}
+grid_rf_8 = GridSearchCV(rf, param_grid=params_rf, cv=kfold,
+                       scoring="accuracy", return_train_score=True, n_jobs=2)
+grid_rf_8.fit(X_ss, y)
+
+>>> print
+
+Wall time: 12min 11s
+```
+
+#### 모형 실험 결과
+- 실험 7의 n_estimators와 max_depth 범위보다 증가시킨 후 성능이 다소 향상되었다.
+    - 0.747427
+    - 과적합은 거의 없다.
+
+```python
+cv_result_rf_8 = pd.DataFrame(grid_rf_8.cv_results_)
+cv_result_rf_8 = cv_result_rf_8[["rank_test_score",
+                                 "param_max_depth",
+                                 "param_n_estimators",
+                                 "param_max_leaf_nodes",
+                                 "mean_test_score",
+                                 "std_test_score",
+                                 "mean_train_score",
+                                 "std_train_score"]]
+cv_result_rf_8 = cv_result_rf_8.sort_values("mean_test_score", ascending=False)[:20]
+cv_result_rf_8
+```
+![bo_25.png](./images/en_bo/bo_25.png)
+
+### 2-9. RF 실험 결과
+- n_estimatros와 max_depth 파라미터가 커질 수록 모형의 성능은 좋지만 과적합이 발생한다.
+    - 0.84 근처의 모형들
+- max_leaf_nodes 파라미터를 함께 사용하면 모형의 성능은 떨어지지만 과적합이 사라진다.
+    - 0.74 근처의 모형들
+- 성능을 높이면서 과적합을 줄이는 파라미터 튜닝에 대한 연구가 필요해 보인다.
+
+```python
+%matplotlib inline
+
+rf_model_scores = [
+    ('grid_rf', 0.8370008882572394),
+    ('grid_rf_2', 0.8394624267187776),
+    ('grid_rf_3', 0.7304874755729258),
+    ('grid_rf_4', 0.8359223071001363),
+    ('grid_rf_5', 0.838230946882217),
+    ('grid_rf_6', 0.8391541422395925),
+    ('grid_rf_7', 0.747120),
+    ('grid_rf_8', 0.747427)
+]
 
 
+plt.figure(figsize=(8, 6))
+plt.scatter([n for n, s in rf_model_scores], [s for n, s in rf_model_scores],
+            c="orange", edgecolors="k", s=50)
+plt.xticks(rotation=-45)
+plt.grid(ls="--", c="k", lw="0.4")
+plt.title("RF : 그리드서치별 best score 비교", y=1.05)
+plt.show() ;
+```
+![bo_26.png](./images/en_bo/bo_26.png)
+
+## 3. ExtraTrees
+- ExtraTree 모형은 DT 개별모형간의 상관관계를 낮추기 위해서 노드의 분할 판단기준을 정할때 독립변수를 랜덤으로 선택하는 것이 특징이다.
+- RF 모형은 노드 분할 시 기준으로 사용할 독립변수의 갯수를 랜덤으로 정한다.
+
+### 3-1. EX Tree 실험 1
+- 파라미터 튜닝 : n_estimators
+    - 0부터 1000까지 50 단위로 증가    
+
+```python
+from sklearn.ensemble import ExtraTreesClassifier
+
+%%time
+
+extra_rf = ExtraTreesClassifier()
+params_extra = {"n_estimators" : np.arange(0, 1001, 50)}
+grid_extra = GridSearchCV(extra_rf, param_grid=params_extra, cv=kfold,
+                       scoring="accuracy", return_train_score=True, n_jobs=2)
+grid_extra.fit(X_ss, y)
+```
+
+#### 모형 실험 결과
+- RF의 실험 결과와 비슷하게 n_estimators의 값이 커질 수록 성능은 좋지만 과적합이 발생한다.
+    - RF의 최대 성능과 유사하다.
+
+```python
+cv_result_extra = pd.DataFrame(grid_extra.cv_results_)
+cv_result_extra = cv_result_extra[["rank_test_score",
+                                   "param_n_estimators",
+                                   "mean_test_score",
+                                   "std_test_score",
+                                   "mean_train_score",
+                                   "std_train_score"]]
+cv_result_extra = cv_result_extra.sort_values("mean_test_score", ascending=False)[:20]
+cv_result_extra
+```
+![bo_27.png](./images/en_bo/bo_27.png)
+
+#### 가장 성능이 좋은 모형
+
+```python
+grid_extra.best_estimator_
+
+>>> print
+
+ExtraTreesClassifier(n_estimators=450)
+```
+
+#### 가장 높은 성능
+
+```python
+grid_extra.best_score_
+
+>>> print
+
+0.842387635459229
+```
 
 
+### 3-2. Extra Tree 실험 2
+- 파라미터 튜닝 : n_estimators, max_depth
+
+```python
+%%time
+
+extra_rf = ExtraTreesClassifier()
+params_extra = {"n_estimators" : np.arange(0, 1001, 100),
+               "max_depth" : np.arange(0, 20)}
+grid_extra_2 = GridSearchCV(extra_rf, param_grid=params_extra, cv=kfold,
+                       scoring="accuracy", return_train_score=True, n_jobs=2)
+grid_extra_2.fit(X_ss, y)
+
+>>> print
+
+Wall time: 12min 22s
+```
+
+#### 모형 실험 결과
+- n_estimators만 사용했을 때보다 max_depth를 함께 사용했을때 과적합이 다소 줄어드는 것을 볼 수 있다.
+    - 성능은 다소 떨어진다.
+
+```python
+cv_result_extra_2 = pd.DataFrame(grid_extra_2.cv_results_)
+cv_result_extra_2 = cv_result_extra_2[["rank_test_score",
+                                   "param_n_estimators",
+                                   "mean_test_score",
+                                   "std_test_score",
+                                   "mean_train_score",
+                                   "std_train_score"]]
+cv_result_extra_2 = cv_result_extra_2.sort_values("mean_test_score", ascending=False)[:20]
+cv_result_extra_2
+```
+![bo_28.png](./images/en_bo/bo_28.png)
 
 
+### 3-3. Extra Tree 실험 3
+- 파라미터 튜닝 : n_estimators, max_depth, max_leaf_nodes
+     - n_estimators의 범위를 125이하로 낮춤
+     - max_leaf_nodes 파라미터 추가
+     - 과적합을 낮춰주는 기능
+
+```python
+%%time
+
+extra_rf = ExtraTreesClassifier()
+params_extra = {"n_estimators" : [25, 50, 75, 100, 125],
+               "max_depth" : np.arange(0, 10),
+               "max_leaf_nodes" : np.arange(0, 16)}
+grid_extra_3 = GridSearchCV(extra_rf, param_grid=params_extra, cv=kfold,
+                       scoring="accuracy", return_train_score=True, n_jobs=2)
+grid_extra_3.fit(X_ss, y)
+
+>>> print
+
+Wall time: 3min 24s
+```
+
+#### 모형 실험 결과
+- max_leaf_nodes 를 추가하여 과적합을 없앴지만 성능은 떨어진다.
+
+```python
+cv_result_extra_3 = pd.DataFrame(grid_extra_3.cv_results_)
+cv_result_extra_3 = cv_result_extra_3[["rank_test_score",
+                                   "param_n_estimators",
+                                   "param_max_depth",
+                                   "param_max_leaf_nodes",
+                                   "mean_test_score",
+                                   "std_test_score",
+                                   "mean_train_score",
+                                   "std_train_score"]]
+cv_result_extra_3 = cv_result_extra_3.sort_values("mean_test_score", ascending=False)[:20]
+cv_result_extra_3
+```
+![bo_29.png](./images/en_bo/bo_29.png)
 
 
+### 3-4. Extra Tree 실험 4
+- 파라미터 튜닝 : n_estimators, max_depth, max_leaf_nodes, max_features
+    - max_features : 노드 분할 시 사용할 독립변수의 갯수를 정하는 방식
+    - auto는 전체 독립변수의 갯수에 루트를 적용한 값, sqrt와 같다.
+    - log는 전체 독립변수의 갯수에 로그를 적용한 값
+    - None은 전체 독립변수를 그대로 사용
+
+```python
+%%time
+
+extra_rf = ExtraTreesClassifier()
+params_extra = {"n_estimators" : [100, 150, 200],
+               "max_depth" : [5, 7, 10, 15],
+               "max_leaf_nodes" : np.arange(0, 16),
+               "max_features" : ["auto", "log", None]}
+grid_extra_4 = GridSearchCV(extra_rf, param_grid=params_extra, cv=kfold,
+                       scoring="accuracy", return_train_score=True, n_jobs=2)
+grid_extra_4.fit(X_ss, y)
+
+>>> print
+
+Wall time: 4min 57s
+```
+
+#### 모형 실험 결과
+- 과적합이 없고 성능이 향상 되었다.
+- 현재 데이터는 독립변수의 갯수가 크지 않으므로 max_features 값을 auto, sqrt, log로 제약할 필요가 없어 보인다.
+
+```python
+cv_result_extra_4 = pd.DataFrame(grid_extra_4.cv_results_)
+cv_result_extra_4 = cv_result_extra_4[["rank_test_score",
+                                   "param_n_estimators",
+                                   "param_max_depth",
+                                   "param_max_leaf_nodes",
+                                   "param_max_features",
+                                   "mean_test_score",
+                                   "std_test_score",
+                                   "mean_train_score",
+                                   "std_train_score"]]
+cv_result_extra_4 = cv_result_extra_4.sort_values("mean_test_score", ascending=False)[:20]
+cv_result_extra_4
+```
+![bo_30.png](./images/en_bo/bo_30.png)
+
+### 3-5. Extra Tree 실험 5
+- 파라미터 튜닝 : n_estimators, max_depth, max_leaf_nodes, max_features
+    - n_estimators, max_leaf_nodes의 범위 증가
+    - max_features는 None으로 고정
+
+```python
+%%time
+
+extra_rf = ExtraTreesClassifier()
+params_extra = {"n_estimators" : [100, 120, 150, 180, 200, 250, 270, 300],
+               "max_depth" : [5, 7, 8, 10, 12, 15],
+               "max_leaf_nodes" : np.arange(0, 20),
+               "max_features" : [None]}
+grid_extra_5 = GridSearchCV(extra_rf, param_grid=params_extra, cv=kfold,
+                       scoring="accuracy", return_train_score=True, n_jobs=2)
+grid_extra_5.fit(X_ss, y)
+
+>>> print
+
+Wall time: 19min 58s
+```
+
+#### 모형 실험 결과
+- Extra Tree 실험 4와 결과가 거의 같다.
+- 즉 max_features를 None으로 한 경우, max_leaf_depth와 n_estimators의 값을 증가시켜도 모형의 성능에 크게 영향을 미치지 않는다.
+
+```python
+cv_result_extra_5 = pd.DataFrame(grid_extra_5.cv_results_)
+cv_result_extra_5 = cv_result_extra_4[["rank_test_score",
+                                   "param_n_estimators",
+                                   "param_max_depth",
+                                   "param_max_leaf_nodes",
+                                   "param_max_features",
+                                   "mean_test_score",
+                                   "std_test_score",
+                                   "mean_train_score",
+                                   "std_train_score"]]
+cv_result_extra_5 = cv_result_extra_5.sort_values("mean_test_score", ascending=False)[:20]
+cv_result_extra_5
+```
+![bo_31.png](./images/en_bo/bo_31.png)
+
+### 7-6. Extra Tree 실험 결과
+- Extra Tree의 실험에서 과적합이 없는 가장 높은 성능은 0.749로 DT, RF 보다 다소 높아진 것을 볼 수 있다.
+- 특히 Extra Tree의 모형은 개별 모형간의 상관관계를 낮추기 위해 각 노드의 분할시 사용하는 독립변수를 랜덤하게 선택하는 것이 특징이다. 
+- 또한 max_features 파라미터가 auto로 설정되면 전체 독립변수 갯수에 루트를 적용한 갯수의 독립변수만 사용하게 된다.
+- 즉 max_features 설정값을 None으로 설정하여 전체 독립변수를 모두 사용하고, 이중에서 무작위로 독립변수를 선택하도록 모형을 생성했을때 성능이 높아진 것을 알 수 있다.
+    - 그러나 독립변수의 갯수가 많은 데이터라면 max_features를 None이 아닌 다른 값으로 설정하는 것이 더 좋을 수도 있다.
+
+```python
+plt.figure(figsize=(8, 6))
+plt.scatter([n for n, s in ex_tree_model_scores],
+            [s for n, s in ex_tree_model_scores],
+            c="orange", edgecolors="k", s=50)
+plt.xticks(rotation=-45)
+plt.grid(ls="--", c="k", lw="0.4")
+plt.title("ExtraTree : 그리드서치별 best score 비교", y=1.05)
+plt.show() ;
+```
+![bo_32.png](./images/en_bo/bo_32.png)
 
 
+## 4. AdaBoost 실험
+
+### 4-1. AdaBoost 실험 1
+- DT, RF, Extra T 실험에서 과적합이 없고 성능이 가장 높은 grid_extra_5 모형을 기본 모형으로 사용
+- 파라미터 튜닝 : n_estimators
+    - 0부터 100까지 10 단위로 증가
+
+```python
+%%time
+
+model_ada = AdaBoostClassifier(grid_extra_5.best_estimator_)
+params_ada = {"n_estimators" : np.arange(0, 101, 10)}
+grid_ada = GridSearchCV(model_ada, param_grid=params_ada, cv=kfold,
+                       scoring="accuracy", return_train_score=True)
+grid_ada.fit(X_ss, y)
+
+>>> print
+
+Wall time: 19min 38s
+```
+
+#### 모형 실험 결과
+- 성능이 크게 개선 되었다.
+    - 취합 방법 모형인 DT, RF, ExtraT 모형보다 성능이 높다.
+    - 과적합이 있지만, DT, RF, ExtraT 모형보다 낮다.
+- 과적합이 거의 없는 모형도 성능이 0.8점 대로 개선 되었다.    
+
+```python
+cv_result_ada = pd.DataFrame(grid_ada.cv_results_)
+cv_result_ada = cv_result_ada[["rank_test_score",
+                               "param_n_estimators",
+                               "mean_test_score",
+                               "std_test_score",
+                               "mean_train_score",
+                               "std_train_score"]]
+cv_result_ada = cv_result_ada.sort_values("mean_test_score", ascending=False)[:20]
+cv_result_ada
+```
+![bo_33.png](./images/en_bo/bo_33.png)
 
 
+### 4-2. AdaBoost 실험 2
+- 파라미터 튜닝 : n_estimators, learning_rate
+    - learning_rate의 범위를 0부터 1까지 0.1 단위로 증가
+    - learning_rate는 정규화 계수로 과적합을 낮춰주는 기능을 한다.
+    - 어떤 값으로 하느냐에 따라서 성능이 달라진다.
 
-
-
-
-
+    
 
 
 
