@@ -169,11 +169,11 @@
     - Extream Randomized Trees 모형은 노드 분리시 랜덤하게 독립변수의 차원을 줄이는 것이 아니라 아예 랜덤하게 독립변수를 선택한다.
 - `앙상블 나무 모형`
     - 개별나무 전체를 평가하는 것이 아니라 각 단계마다 새로운 개별나무를 추가해나가는 방식
-    - $\hat{y}i^{t} = \sum_{k=1}^{t} f_k(x_i) = \hat{y}_i^{t-1} + f_t(x_i)$
+    - $\hat{y}_i^{t} = \sum_{k=1}^{t} f_k(x_i) = \hat{y}_i^{t-1} + f_t(x_i)$
     - 목적함수 : $\begin{aligned}
 \text{obj}^{(t)} 
-&= \sum_{i=1}^{n} l(y_i, \hat{y}_i^{(t)}) + \sum_{i=1}^{t} \omega (f_i) \\
-&= \sum_{i=1}^{n} l(y_i, \hat{y}_i^{(t-1)} + f_t (x_i)) + \omega (f_i) + constant 
+&= \sum_{i=1}^{n} l(y_i, \hat{y_i}^{(t)}) + \sum_{i=1}^{t} \omega (f_i) \\
+&= \sum_{i=1}^{n} l(y_i, \hat{y_i}^{(t-1)} + f_t (x_i)) + \omega (f_i) + constant 
 \end{aligned}$
     - 목저감수의 손실함수를 MSE를 사용하면 수식정리가 간단하지만, 로지스틱 손실함수를 사용하면 테일러 확장을 적용해야하므로 정리가 쉽지 않다.
 - `XGBoost 모형의 목적함수` : 로그손실 값을 손실함수로 사용
