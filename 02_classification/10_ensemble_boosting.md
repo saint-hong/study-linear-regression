@@ -83,20 +83,11 @@
         - 개별모형의 결과와 가중치의 선형조합형태
     - C_m 식을 손실함수 L에 대입하여 정리
 
-    - <img src="https://latex.codecogs.com/gif.latex?%5Cbegin%7Baligned%7D%20L_m%20%26%3D%20%5Csum_%7Bi%3D1%7D%5E%7BN%7D%20exp%28-y_i%20C_m%20%28x_i%29%29%20%5C%5C%20%26%3D%20%5Csum_%7Bi%3D1%7D%5E%7BN%7D%20exp%28-y_i%20C_%7Bm-1%7D%28x_i%29%20-%20%5Calpha_m%20y_i%20k_m%20%28x_i%29%29%20%5C%5C%20%26%3D%20%5Csum_%7Bi%3D1%7D%5E%7BN%7D%20exp%28-y_i%20C_%7Bm-1%7D%28x_i%29%29%20exp%28-%20%5Calpha_m%20y_i%20k_m%20%28x_i%29%29%5C%5C%20%26%3D%20%5Csum_%7Bi%3D1%7D%5E%7BN%7D%20w_%7Bm%2Ci%7D%20exp%28-%20%5Calpha_m%20y_i%20k_m%20%28x_i%29%29%20%5Cend%7Baligned%7D" />
-
-
-
-
-
+    - <img src="https://latex.codecogs.com/gif.latex?%5Cbegin%7Baligned%7D%20L_m%20%26%3D%20%5Csum_%7Bi%3D1%7D%5E%7BN%7D%20exp%28-y_i%20C_m%20%28x_i%29%29%20%5C%5C%20%26%3D%20%5Csum_%7Bi%3D1%7D%5E%7BN%7D%20exp%28-y_i%20C_%7Bm-1%7D%28x_i%29%20-%20%5Calpha_m%20y_i%20k_m%20%28x_i%29%29%20%5C%5C%20%26%3D%20%5Csum_%7Bi%3D1%7D%5E%7BN%7D%20exp%28-y_i%20C_%7Bm-1%7D%28x_i%29%29%20exp%28-%20%5Calpha_m%20y_i%20k_m%20%28x_i%29%29%5C%5C%20%26%3D%20%5Csum_%7Bi%3D1%7D%5E%7BN%7D%20w_%7Bm%2Ci%7D%20exp%28-%20%5Calpha_m%20y_i%20k_m%20%28x_i%29%29%20%5Cend%7Baligned%7D">
 
     - 종속변수 y_i와 개별모형 k_m(x_i)의 값은 1 또는 -1 만 가질 수 있으므로,
     
-    - <img src="https://latex.codecogs.com/gif.latex?%5Cbegin%7Baligned%7D%20L_m%20%26%3D%20e%5E%7B-%5Calpha_m%7D%20%5Csum_%7Bk_m%28x_i%29%20%3D%20y_i%7D%20w_%7Bm%2Ci%7D%20&plus;%20e%5E%7B%5Calpha_m%7D%20%5Csum_%7Bk_m%28x_i%29%20%5Cneq%20y_i%7D%20w_%7Bm%2Ci%7D%5C%5C%20%26%3D%20%28e%5E%7B%5Calpha_m%7D%20-%20e%5E%7B-%5Calpha_m%7D%29%20%5Csum_%7Bi%3D1%7D%5E%7BN%7D%20w_%7Bm%2Ci%7D%20I%28k_m%28x_i%29%20%5Cneq%20y_i%29%20&plus;%20e%5E%7B-%5Calpha_m%7D%20%5Csum_%7Bi%3D1%7D%5E%7BN%7D%20w_%7Bm%2Ci%7D%20%5Cend%7Baligned%7D" />
-
-
-
-
+    - <img src="https://latex.codecogs.com/gif.latex?%5Cbegin%7Baligned%7D%20L_m%20%26%3D%20e%5E%7B-%5Calpha_m%7D%20%5Csum_%7Bk_m%28x_i%29%20%3D%20y_i%7D%20w_%7Bm%2Ci%7D%20&plus;%20e%5E%7B%5Calpha_m%7D%20%5Csum_%7Bk_m%28x_i%29%20%5Cneq%20y_i%7D%20w_%7Bm%2Ci%7D%5C%5C%20%26%3D%20%28e%5E%7B%5Calpha_m%7D%20-%20e%5E%7B-%5Calpha_m%7D%29%20%5Csum_%7Bi%3D1%7D%5E%7BN%7D%20w_%7Bm%2Ci%7D%20I%28k_m%28x_i%29%20%5Cneq%20y_i%29%20&plus;%20e%5E%7B-%5Calpha_m%7D%20%5Csum_%7Bi%3D1%7D%5E%7BN%7D%20w_%7Bm%2Ci%7D%20%5Cend%7Baligned%7D">
 
     - **L_m을 최소화하는 alpha_m**
     - $\dfrac{d L_m}{d \alpha_m} = 0$
@@ -180,7 +171,7 @@
     - $\hat{y_i}^{t} = \sum_{k=1}^{t} f_k(x_i) = \hat{y_i}^{t-1} + f_t(x_i)$
     - 목적함수 : 
     
-    <img src = "https://latex.codecogs.com/gif.latex?%5Cbegin%7Baligned%7D%20%5Ctext%7Bobj%7D%5E%7B%28t%29%7D%20%26%3D%20%5Csum_%7Bi%3D1%7D%5E%7Bn%7D%20l%28y_i%2C%20%5Chat%7By_i%7D%5E%7B%28t%29%7D%29%20&plus;%20%5Csum_%7Bi%3D1%7D%5E%7Bt%7D%20%5Comega%20%28f_i%29%20%5C%5C%20%26%3D%20%5Csum_%7Bi%3D1%7D%5E%7Bn%7D%20l%28y_i%2C%20%5Chat%7By_i%7D%5E%7B%28t-1%29%7D%20&plus;%20f_t%20%28x_i%29%29%20&plus;%20%5Comega%20%28f_i%29%20&plus;%20constant%20%5Cend%7Baligned%7D" />
+    -<img src = "https://latex.codecogs.com/gif.latex?%5Cbegin%7Baligned%7D%20%5Ctext%7Bobj%7D%5E%7B%28t%29%7D%20%26%3D%20%5Csum_%7Bi%3D1%7D%5E%7Bn%7D%20l%28y_i%2C%20%5Chat%7By_i%7D%5E%7B%28t%29%7D%29%20&plus;%20%5Csum_%7Bi%3D1%7D%5E%7Bt%7D%20%5Comega%20%28f_i%29%20%5C%5C%20%26%3D%20%5Csum_%7Bi%3D1%7D%5E%7Bn%7D%20l%28y_i%2C%20%5Chat%7By_i%7D%5E%7B%28t-1%29%7D%20&plus;%20f_t%20%28x_i%29%29%20&plus;%20%5Comega%20%28f_i%29%20&plus;%20constant%20%5Cend%7Baligned%7D">
     
     - 목저감수의 손실함수를 MSE를 사용하면 수식정리가 간단하지만, 로지스틱 손실함수를 사용하면 테일러 확장을 적용해야하므로 정리가 쉽지 않다.
 - `XGBoost 모형의 목적함수` : 로그손실 값을 손실함수로 사용
