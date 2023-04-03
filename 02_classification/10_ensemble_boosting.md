@@ -86,10 +86,18 @@
     - <img src="https://latex.codecogs.com/gif.latex?%5Cbegin%7Baligned%7D%20L_m%20%26%3D%20%5Csum_%7Bi%3D1%7D%5E%7BN%7D%20exp%28-y_i%20C_m%20%28x_i%29%29%20%5C%5C%20%26%3D%20%5Csum_%7Bi%3D1%7D%5E%7BN%7D%20exp%28-y_i%20C_%7Bm-1%7D%28x_i%29%20-%20%5Calpha_m%20y_i%20k_m%20%28x_i%29%29%20%5C%5C%20%26%3D%20%5Csum_%7Bi%3D1%7D%5E%7BN%7D%20exp%28-y_i%20C_%7Bm-1%7D%28x_i%29%29%20exp%28-%20%5Calpha_m%20y_i%20k_m%20%28x_i%29%29%5C%5C%20%26%3D%20%5Csum_%7Bi%3D1%7D%5E%7BN%7D%20w_%7Bm%2Ci%7D%20exp%28-%20%5Calpha_m%20y_i%20k_m%20%28x_i%29%29%20%5Cend%7Baligned%7D" />
 
 
+
+
+
+
     - 종속변수 y_i와 개별모형 k_m(x_i)의 값은 1 또는 -1 만 가질 수 있으므로,
     
     - <img src="https://latex.codecogs.com/gif.latex?%5Cbegin%7Baligned%7D%20L_m%20%26%3D%20e%5E%7B-%5Calpha_m%7D%20%5Csum_%7Bk_m%28x_i%29%20%3D%20y_i%7D%20w_%7Bm%2Ci%7D%20&plus;%20e%5E%7B%5Calpha_m%7D%20%5Csum_%7Bk_m%28x_i%29%20%5Cneq%20y_i%7D%20w_%7Bm%2Ci%7D%5C%5C%20%26%3D%20%28e%5E%7B%5Calpha_m%7D%20-%20e%5E%7B-%5Calpha_m%7D%29%20%5Csum_%7Bi%3D1%7D%5E%7BN%7D%20w_%7Bm%2Ci%7D%20I%28k_m%28x_i%29%20%5Cneq%20y_i%29%20&plus;%20e%5E%7B-%5Calpha_m%7D%20%5Csum_%7Bi%3D1%7D%5E%7BN%7D%20w_%7Bm%2Ci%7D%20%5Cend%7Baligned%7D" />
-    
+
+
+
+
+
     - **L_m을 최소화하는 alpha_m**
     - $\dfrac{d L_m}{d \alpha_m} = 0$
     
