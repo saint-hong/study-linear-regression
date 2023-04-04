@@ -74,6 +74,7 @@
 
 
     - 예측이 맞은 경우 가중치 값은 작아지고, 예측이 틀린 경우 가중치 값은 크게 확대(boosting) 된다.
+        - 후속 약분류기는 이전 약분류기에서 예측이 틀린 데이터에 대해 학습을 더 집중하게 된다.
     - m번째 개별 모형의 모든 후보에 대해 이 손실함수 L을 적용하여 값이 가장 작은 후보 를 선택한다.
 
 ### 3-2. 에이다부스팅의 손실함수
@@ -1840,11 +1841,40 @@ cv_result_ada
     - learning_rate의 범위를 0부터 1까지 0.1 단위로 증가
     - learning_rate는 정규화 계수로 과적합을 낮춰주는 기능을 한다.
     - 어떤 값으로 하느냐에 따라서 성능이 달라진다.
+- 학습시간이 오래 걸린다.
 
-    
+```python
+%%time
 
+model_ada = AdaBoostClassifier(grid_extra_5.best_estimator_)
+params_ada = {"n_estimators" : [30, 50, 60, 90],
+             "learning_rate" : np.linspace(0, 1, 10).round(1)}
+grid_ada_2 = GridSearchCV(model_ada, param_grid=params_ada, cv=kfold,
+                       scoring="accuracy", return_train_score=True)
+grid_ada_2.fit(X_ss, y)
 
+>>> print
 
+Wall time: 1h 16min 13s
+```
+
+#### 모형 실험 결과
+- 모형의 성능은 유지하면서 과적합이 다소 낮아졌다.
+    - learning_rate 파라미터가 과적합을 낮춰준다는 것을 알 수 있다.
+
+```python
+cv_result_ada_2 = pd.DataFrame(grid_ada_2.cv_results_)
+cv_result_ada_2 = cv_result_ada_2[["rank_test_score",
+                               "param_n_estimators",
+                               "param_learning_rate",
+                               "mean_test_score",
+                               "std_test_score",
+                               "mean_train_score",
+                               "std_train_score"]]
+cv_result_ada_2 = cv_result_ada_2.sort_values("mean_test_score", ascending=False)[:20]
+cv_result_ada_2
+```
+![bo_34.png](./images/en_bo/bo_34.png)
 
 
 
