@@ -21,9 +21,9 @@ Description and Summary of the classification
     - 랜덤 포레스트(random forest)
     - 부스팅(boosting)
         - adaboost
-	- gradient boost
-	- XGboost
-	- LightGBM
+        - gradient boost
+        - XGboost
+        - LightGBM
 - 모형최적화
     - hyperparameter tunning
     - grid search
