@@ -16,9 +16,9 @@ Description and Summary of the classification
     - 서포트벡터머신(SVM)
 - 모형결합(ensemble)
     - 취합 방법
-    - majority voting
-    - bagging
-    - 랜덤 포레스트(random forest)
+        - majority voting
+        - bagging
+        - 랜덤 포레스트(random forest)
     - 부스팅(boosting)
         - adaboost
         - gradient boost
